@@ -1,0 +1,41 @@
+#include <unistd.h> //write, read, access, dup, dup2, execve, fork, pipe, unlink
+#include <sys/wait.h> //wait, waitpid
+#include <fcntl.h> //open, close
+#include <stdlib.h> // malloc, free 
+#include <stdio.h> // perror
+#include <errno.h>
+#include "./minishell_libft/libft.h"
+#include <readline/readline.h>
+#include <readline/history.h>
+
+
+/*struct of a node in a linked list. Each node's data made of env var name + content 
+Essentially a copy of char **env, likely done to easily manipulate env vars by our program
+*/
+typedef struct s_env
+{
+    char			*env_name;
+    char			*env_value;
+	struct s_env	*next;
+}	t_env;
+
+/*mother of all structs, to be completed as we advance on project
+*/
+typedef struct s_sh_data
+{
+    t_env   *env_header; // pointer to the head of the linked list holding the env vars
+}   t_sh_data;
+
+
+
+//minishell.c
+t_env *dup_env(char **envp);
+void shell_init(t_sh_data *sh, char **envp);
+char    *get_input(char *line);
+void shell_loop(t_sh_data *sh);
+void env_checker(char **envp);
+void	argc_checker(int argc);
+
+//env_utils.c
+t_env	*env_create_node(char *var_name, char *var_content);
+void	env_add_node(t_env **header, t_env *new_node);
