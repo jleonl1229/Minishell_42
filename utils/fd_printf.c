@@ -1,4 +1,4 @@
-#include <unistd.h>
+/*#include <unistd.h>
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -71,7 +71,7 @@ int fd_printf(int fd, char const *format, ...)
 	}
 	va_end(arg);
 	return (total);
-}
+}*/
 
 /* void think(va_list *arg, int *total, char const *format, int fd) */
 /* { */
@@ -111,11 +111,13 @@ int fd_printf(int fd, char const *format, ...)
 /* 	} */
 /* 	va_end(arg); */
 /* 	return (total); */
-/* } */
+/* } 
 
 int main(void)
 {
 	int n = fd_printf(1, "%d", 150);
 	printf("\n%x", n);
 	return (0);
-}
+}*/
+
+
