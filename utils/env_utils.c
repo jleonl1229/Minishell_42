@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../minishell.h"
 
 /*Need to manage memory allocated in ft_strdup!!
 */

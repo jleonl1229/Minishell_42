@@ -24,18 +24,27 @@ typedef struct s_env
 typedef struct s_sh_data
 {
     t_env   *env_header; // pointer to the head of the linked list holding the env vars
+    char    *prev_line; //last line saved to history
 }   t_sh_data;
 
 
 
-//minishell.c
+//shell_init/shell_init.c
 t_env *dup_env(char **envp);
 void shell_init(t_sh_data *sh, char **envp);
+
+//shell_loop/shell_loop.c
+void save_to_history(t_sh_data *sh, char *line);
 char    *get_input(char *line);
 void shell_loop(t_sh_data *sh);
+
+//minishell.c
 void env_checker(char **envp);
 void	argc_checker(int argc);
 
 //env_utils.c
 t_env	*env_create_node(char *var_name, char *var_content);
 void	env_add_node(t_env **header, t_env *new_node);
+
+//input_utils.c
+int	is_space(char *line);
