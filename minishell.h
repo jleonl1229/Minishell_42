@@ -38,6 +38,9 @@ void save_to_history(t_sh_data *sh, char *line);
 char    *get_input(char *line);
 void shell_loop(t_sh_data *sh);
 
+//shell_loop/input_validation.c
+
+
 //minishell.c
 void env_checker(char **envp);
 void	argc_checker(int argc);
@@ -47,4 +50,8 @@ t_env	*env_create_node(char *var_name, char *var_content);
 void	env_add_node(t_env **header, t_env *new_node);
 
 //input_utils.c
+int	bad_initial_char(char *line);
+int	bad_final_char(char *line);
+int is_open_quotes(char *line);
 int	is_space(char *line);
+

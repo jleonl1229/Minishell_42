@@ -33,12 +33,11 @@ void shell_loop(t_sh_data *sh)
 
     while (1)
     {
-        //signals
-        //terminal_prompt
+        //signals (need to be reset every time? could it go before while loop?)
         line = get_input(line);
         save_to_history(sh, line);
         //if (input_valid(line) == 0)
-            //continue
+            //continue (skip everything else and start the loop again)
         //parsing
         if (ft_strncmp(line, "exit", ft_strlen("exit")) == 0)
         {
