@@ -36,8 +36,8 @@ void shell_loop(t_sh_data *sh)
         //signals (need to be reset every time? could it go before while loop?)
         line = get_input(line);
         save_to_history(sh, line);
-        //if (input_valid(line) == 0)
-            //continue (skip everything else and start the loop again)
+        if (input_validation(line) == 0)
+            continue; //(skip everything else and start the loop again)
         //parsing
         if (ft_strncmp(line, "exit", ft_strlen("exit")) == 0)
         {

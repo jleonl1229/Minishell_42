@@ -42,7 +42,7 @@ int main() {
     return 0;
 }*/
 
-#include <stdio.h>
+/*#include <stdio.h>
 #include <stdbool.h>
 
 
@@ -107,7 +107,7 @@ int main() {
     }
 
     return 0;
-}
+}*/
 
 
 /*int main() {

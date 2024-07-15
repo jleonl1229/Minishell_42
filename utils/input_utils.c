@@ -1,8 +1,42 @@
 #include "../minishell.h"
 
 
+/*
+	checks if user inputed special chars "<", ">" or "||"
+	more than 2 times contiguosly
+	
+	example: "<>>" and "|<|" should throw a syntax error
 
+	returns 1 if invalid sequence, 0 otherwise
+*/
+int invalid_sequence(char *line)
+{
+	int i;
+	int count;
 
+	i = 0;
+	count = 0;
+    while (line[i] != '\0')
+	{
+        if (line[i] == '<' || line[i] == '>' || line[i] == '|')
+		{
+            count = 1;
+            while (line[i + 1] == '<' || line[i + 1] == '>'
+			|| line[i + 1] == '|') 
+			{
+                count++;
+                i++;
+            }
+            if (count >= 3)
+			{
+				printf("bash: syntax error near unexpected token '%c'\n", line[i-1]);
+				return 1;
+			}
+        }
+		i++;
+    }
+    return 0;
+}
 
 /*
  * Checks if line, after trimming leading whitespace characters,
@@ -12,7 +46,7 @@
  * Returns 1 if pipe '|' is found as the initial character, 0 otherwise.
  */
 
-/*int	bad_initial_char(char *line)
+int	bad_initial_char(char *line)
 {
 	int result;
 	const char *space_chars;
@@ -33,7 +67,7 @@
 	}
 	free(trimmed);
 	return (result);
-}*/
+}
 
 /*
 	Pretty simmilar to the bad_initial_char (can we put them both in a single function?),
@@ -42,7 +76,7 @@
 	returns 1 if mentioned char is found, 0 otherwise
 
 */
-/*int	bad_final_char(char *line)
+int	bad_final_char(char *line)
 {
 	int result;
 	const char *space_chars;
@@ -67,7 +101,7 @@
 	}
 	free(trimmed);
 	return (result);
-}*/
+}
 
 
 /*
@@ -78,7 +112,7 @@ in the loop, if the condition is triggered 1 becomes 0 and 0 becomes 1
 returns 1 if open quotes found, 0 otherwise
 */
 
-/*int is_open_quotes (char *line)
+int is_open_quotes (char *line)
 {
 	int	single_q;
 	int	double_q;
@@ -95,11 +129,11 @@ returns 1 if open quotes found, 0 otherwise
 	}
 	if (single_q || double_q)
 	{
-		printf("syntax error: unclosed quotes"); //to be changed by fd_printf, stderror
+		printf("syntax error: unclosed quotes\n"); //to be changed by fd_printf, stderror
 		return 1;
 	}
 	return 0;
-}*/
+}
 
 
 /*

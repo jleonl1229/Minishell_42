@@ -39,7 +39,8 @@ char    *get_input(char *line);
 void shell_loop(t_sh_data *sh);
 
 //shell_loop/input_validation.c
-
+int input_validation(char *line);
+int invalid_input_checker(char *line);
 
 //minishell.c
 void env_checker(char **envp);
@@ -54,9 +55,11 @@ int	bad_initial_char(char *line);
 int	bad_final_char(char *line);
 int is_open_quotes(char *line);
 int	is_space(char *line);
+int invalid_sequence(char *line);
 
 //input_utils2.c
 void skip_spaces(char *str, int *index);
 void skip_quotes(char *str, int *index);
 int	space_and_chars(char *line);
+int sized2_invalid(char *line);
 

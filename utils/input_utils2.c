@@ -1,12 +1,13 @@
 #include "../minishell.h"
 
 
-
+//util for space_and_chars() 
 void skip_spaces(char *str, int *index) {
     while (str[*index] != '\0' && (str[*index] == 32 || (str[*index]) == 9))
 		(*index)++;
 }
 
+//util for space_and_chars()
 void skip_quotes(char *str, int *index) 
 {
     char quote_char;
@@ -50,5 +51,29 @@ int	space_and_chars(char *line)
 		if (line[i]) //I think we can get rid of this condition
 			i++;
 	}
+	return (0);
+}
+
+/*checks for specific invalid sequence of special chars
+invalid_sequence() will trigger a syntax error for every sequence where a special char
+('<', '>' or '|') is repeated more than 2 times, and this function will throw error for 3 specific
+cases.
+*/
+int sized2_invalid(char *line)
+{
+	const char *patterns[] = {"||", "><", "<|"};
+    int i;
+	
+	i = 0;
+	while(i < 3) //pattern array size is 3
+	{
+		if(ft_strnstr(line, patterns[i], ft_strlen(line)) != NULL)
+		{
+			printf("bash: syntax error near unexpected token '%c'\n", patterns[i][1]);
+			return (1);
+		}
+
+		i++;
+	} 
 	return (0);
 }

@@ -11,28 +11,26 @@ there is a non-valid sequence(||) or there are spaces between invalid sequence (
 
 Returns 0 if not valid
 */
-/*int is_valid_cl(char *line)
+int invalid_input_checker(char *line)
 {
-    //if is_open_quotes(line) == 1 || char_beginning(line) ==1 || char_end(line) == 1
-    //|| spaces_between_chars(line) == 1 || forbidden_sequence(line) == 1
-        //return 0
-    
-
-}*/
+    if (is_open_quotes(line) == 1 || bad_initial_char(line) == 1 
+    || bad_final_char(line) == 1 || invalid_sequence(line) == 1
+    || space_and_chars(line) == 1 || sized2_invalid(line) == 1)
+        return 1;
+    return 0;
+}
 
 /*
 checks if command line is valid,
 returns 0 if not
 */
-/*int input_validation (char *line)
+int input_validation(char *line)
 {
-    if (*line = '\0' || is_space(line) == 1)
+    if (*line == '\0' || is_space(line) == 1)
         return 0;
-    else if (is_valid_cl(line) == 0)
-    {
+    else if (invalid_input_checker(line) == 1)
         return 0;
-    }
     else
-        //correct input
+        return 1;
 
-}*/
+}
