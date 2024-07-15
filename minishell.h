@@ -55,3 +55,8 @@ int	bad_final_char(char *line);
 int is_open_quotes(char *line);
 int	is_space(char *line);
 
+//input_utils2.c
+void skip_spaces(char *str, int *index);
+void skip_quotes(char *str, int *index);
+int	space_and_chars(char *line);
+
