@@ -13,7 +13,7 @@ RM           = rm -rf
 CFILES = $(wildcard $(MINISHELL_DIR)*.c) \
          $(wildcard $(SHELL_INIT_DIR)*.c) \
          $(wildcard $(SHELL_LOOP_DIR)*.c) \
-         $(wildcard $(UTILS_DIR)*.c)
+         $(wildcard $(UTILS_DIR)*.c) \
 
 OFILES = $(CFILES:.c=.o)
 

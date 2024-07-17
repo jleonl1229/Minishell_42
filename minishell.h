@@ -29,6 +29,9 @@ typedef struct s_sh_data
 
 
 
+//parsing/parsing.c
+char **split_by_pipe(char *line, int start, int segment_index, int i);
+
 //shell_init/shell_init.c
 t_env *dup_env(char **envp);
 void shell_init(t_sh_data *sh, char **envp);
@@ -46,20 +49,22 @@ int invalid_input_checker(char *line);
 void env_checker(char **envp);
 void	argc_checker(int argc);
 
-//env_utils.c
+//utils/env_utils.c
 t_env	*env_create_node(char *var_name, char *var_content);
 void	env_add_node(t_env **header, t_env *new_node);
 
-//input_utils.c
+//utils/input_utils.c
 int	bad_initial_char(char *line);
 int	bad_final_char(char *line);
 int is_open_quotes(char *line);
 int	is_space(char *line);
 int invalid_sequence(char *line);
 
-//input_utils2.c
+//utils/input_utils2.c
 void skip_spaces(char *str, int *index);
 void skip_quotes(char *str, int *index);
 int	space_and_chars(char *line);
 int sized2_invalid(char *line);
 
+//utils/parsing_utils.c
+int count_segments(char *str);
