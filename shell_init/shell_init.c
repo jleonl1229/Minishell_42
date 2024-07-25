@@ -47,4 +47,5 @@ void shell_init(t_sh_data *sh, char **envp)
     }
     sh->env_header = dup_env(envp); //copies envp in sh->env_header
     sh->prev_line = NULL; //only null whe initialized
+    sh->parsed_header = NULL;
 }
