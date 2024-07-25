@@ -47,15 +47,16 @@ void	argc_checker(int argc)
 
 int main(int argc, char **argv, char **envp)
 {
-    t_sh_data sh;
+    t_sh_data *sh;
 
+    sh = (t_sh_data *)malloc(sizeof(t_sh_data));
     printf("argv[0] is: %s\n", argv[0]); //to be replaced by (void)argv
     argc_checker(argc);
         //exit error if argc > 1
     env_checker(envp);
         //exit error if envp or *envp NULL
-    printf("entering shell init...\n");
-    shell_init(&sh, envp);
-    shell_loop(&sh);
+    shell_init(sh, envp);
+    printf("entering shell loop...\n");
+    shell_loop(sh);
     return 0;
 }
