@@ -3,7 +3,7 @@
 /*
 split command line into pipe segments
 */
-char **split_by_pipe(char *line, int start, int segment_index, int i) 
+/*char **split_by_pipe(char *line, int start, int segment_index, int i) 
 {
     int segments;
     char **result;
@@ -29,14 +29,15 @@ char **split_by_pipe(char *line, int start, int segment_index, int i)
     }
     result[segments] = NULL;
     return result;
-}
+}*/
 
 /* 
+    *initializes a new t_parsed_data node and handles functions to fill the node with data
     *   @param: an array of strings, representing a pipe segment
     *    splitted by spaces.
     *   returns pointer to the head of the linked list
 */
-void parse_line(t_parsed_data **header, char **pipe_segment) 
+/*void parse_line(t_parsed_data **header, char **pipe_segment) 
 {
     t_parsed_data *node;
 	char **cpy_segment;
@@ -82,4 +83,5 @@ t_parsed_data *parsing(t_sh_data *sh, char *line)
 		parse_line(&head, split_space);
 	}
     return head;
-}
+}*/
+

@@ -1,52 +1,94 @@
 #include "../minishell.h"
 
 
-/*
-**  saves input to history if line is not null and line is not equal to previous line
-*/
-void save_to_history(t_sh_data *sh, char *line) 
+int append_line(t_sh_data *sh, char *line)
 {
-    if (line != NULL && (sh->prev_line == NULL || ft_strncmp(line, sh->prev_line, ft_strlen(line)) != 0))
+    char *new_line;
+    int len;
+
+    len = ft_strlen(sh->prev_line) + ft_strlen(line) + 1;
+    if (sh->prev_line != NULL)
+    {
+        new_line = malloc(len);
+        if (new_line == NULL)
+            pre_parse_cleanup(&sh, NULL, NULL);
+        ft_strlcpy(new_line, sh->prev_line, len);
+        ft_strlcat(new_line, line, len);
+        add_history(new_line);
+        free(sh->prev_line);
+        sh->prev_line = new_line;
+    } 
+    else 
     {
         add_history(line);
-        sh->prev_line = line;
+        sh->prev_line = ft_strdup(line);
     }
+    return 0;
 }
 
-/*
-**  uses readline to show prompt and retrieve inputed line
- */
-char    *get_input(char *line)
+int save_to_history(t_sh_data *sh, char *line, int e_pipe) 
+{
+    if (line != NULL)
+    {
+        if (e_pipe == 1)
+            append_line(sh, line);
+        else
+        {
+            if (sh->prev_line == NULL || ft_strncmp(line, sh->prev_line, ft_strlen(line)) != 0) 
+            {
+                add_history(line);
+                free(sh->prev_line);
+                sh->prev_line = ft_strdup(line);
+            }
+        }
+    }
+    return 0;
+}
+
+int get_input(t_sh_data *sh, char *line, int e_pipe)
 {
     char *str;
 
-    str = "$ "; //prompt
-    line = readline(str); //the line returned by readline uses  malloc
-    printf("line is: %s\n", line);
-    return line;
+    printf("epipe is: %d\n", e_pipe);
+    if(e_pipe == 0)
+        str = "$ "; 
+    else
+        str = "> ";
+    line = readline(str);
+    return (save_to_history(sh, line, e_pipe));
+
 }
 
-void shell_loop(t_sh_data *sh)
+void shell_loop(t_sh_data **sh)
 {
     char *line;
+    int e_pipe;
+    int checker;
 
+    line = NULL;
+    e_pipe = 0;
     while (1)
     {
         //signals (need to be reset every time? could it go before while loop?)
-        line = get_input(line);
-        save_to_history(sh, line);
-        if (input_validation(line) == 0)
-            continue; //(skip everything else and start the loop again)
-        //printf("entering parsing\n");
-        sh->parsed_header = parsing(sh, line);
-        if (ft_strncmp(line, "exit", ft_strlen("exit")) == 0)
+        e_pipe = get_input(*sh, line, e_pipe);
+        checker = input_validation((*sh)->prev_line, sh);
+        if (checker == 0)
+            continue;
+        else if (checker == 7)
+        {
+            e_pipe = 1;
+            continue;
+        }
+        //sh->parsed_header = parsing(sh, (*sh)->prev_line);
+        if (ft_strncmp((*sh)->prev_line, "exit", ft_strlen("exit")) == 0)
         {
             write(1, "exit\n", ft_strlen("exit\n"));
             break;
         }
-        write(1, line, ft_strlen(line));
+        write(1, (*sh)->prev_line, ft_strlen((*sh)->prev_line));
         write(1, "\n",1);
-        int i;
+
+        /*int i;
         while(sh->parsed_header != NULL)
         {
             printf("sh->parsed_header->cmd is: %s\n", sh->parsed_header->cmd);
@@ -62,8 +104,12 @@ void shell_loop(t_sh_data *sh)
             printf("sh->parsed_header->append is: %s\n", sh->parsed_header->append);
             printf("sh->parsed_header->next is: %p\n", (void *)sh->parsed_header->next);           
             sh->parsed_header = sh->parsed_header->next;
-        }
-
-
+        }*/
+        free(line);
     }
+    //frees when exiting program successfully
+    free_env_list((*sh)->env_header);
+    free((*sh)->prev_line);
+    free(*sh);
+    
 }

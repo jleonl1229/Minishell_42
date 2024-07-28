@@ -61,11 +61,11 @@ cases.
 */
 int sized2_invalid(char *line)
 {
-	const char *patterns[] = {"||", "><", "<|"};
+	const char *patterns[] = {"><", "<|"};
     int i;
 	
 	i = 0;
-	while(i < 3) //pattern array size is 3
+	while(i < 2)
 	{
 		if(ft_strnstr(line, patterns[i], ft_strlen(line)) != NULL)
 		{
@@ -73,6 +73,37 @@ int sized2_invalid(char *line)
 			return (1);
 		}
 
+		i++;
+	} 
+	return (0);
+}
+
+/*
+**	checks if special chars are valid in Bash but we have not implemented 
+**	their functionality
+*/
+int valid_not_implemented(char *line)
+{
+	const char *patterns[] = {"<<<", "|>|", "||", ">|", NULL};
+    int i;
+	char *found;
+	char next_char;
+	
+	i = 0;
+	while(patterns[i] != NULL)
+	{
+		found = ft_strnstr(line, patterns[i], strlen(line));
+		if (found != NULL)
+		{
+			if (*(--found) == '|' || *found == '<' || *found =='>')
+				return 0;
+			next_char = *(found +ft_strlen(patterns[i]) +1);
+			if (next_char != '\0' && next_char != '|' && next_char != '<' && next_char != '>')
+            {
+                printf("The Bash feature '%s' is not implemented in this minishell\n", patterns[i]);
+                return 1;
+            }
+		}
 		i++;
 	} 
 	return (0);

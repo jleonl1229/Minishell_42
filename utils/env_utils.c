@@ -10,10 +10,23 @@ t_env	*env_create_node(char *var_name, char *var_content)
 	if (new_node == NULL)
 		return (NULL);
 	new_node->env_name = ft_strdup(var_name);
+	if (new_node->env_name == NULL)
+	{
+		free(new_node);
+		return NULL;
+	}
     if (var_content == NULL)
         new_node->env_value = NULL;
     else
-	    new_node->env_value = ft_strdup(var_content);
+	{
+		new_node->env_value = ft_strdup(var_content);
+		if (new_node->env_value == NULL)
+		{
+			free(new_node->env_name);
+			free(new_node);
+			return NULL;
+		}
+	}
 	new_node->next = NULL;
 	return (new_node);
 }

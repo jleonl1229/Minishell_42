@@ -50,38 +50,48 @@ void parse_line(  t_parsed_data **head, char **pipe_segment);
 t_parsed_data *parsing(t_sh_data *sh, char *line);
 
 //shell_init/shell_init.c
-t_env *dup_env(char **envp);
-void shell_init(t_sh_data *sh, char **envp);
+t_env *dup_env(char **envp, t_env *header, t_sh_data **sh);
+void shell_init(t_sh_data **sh, char **envp);
 
 //shell_loop/shell_loop.c
-void save_to_history(t_sh_data *sh, char *line);
-char    *get_input(char *line);
-void shell_loop(t_sh_data *sh);
+int append_line(t_sh_data *sh, char *line);
+int save_to_history(t_sh_data *sh, char *line, int e_pipe);
+int get_input(t_sh_data *sh, char *line, int e_pipe);
+void shell_loop(t_sh_data **sh);
 
 //shell_loop/input_validation.c
-int input_validation(char *line);
-int invalid_input_checker(char *line);
+char three_invalid_print(char *line, char *last_invalid);
+int three_valid(char *line);
+int input_validation(char *line, t_sh_data **sh);
 
 //minishell.c
-void env_checker(char **envp);
-void	argc_checker(int argc);
+void env_checker(char **envp, t_sh_data **sh);
+void	argc_checker(int argc, t_sh_data **sh);
+
+//errors_frees/frees.c
+char	**free_matrix(char **pointer);
+void free_env_list(t_env *head);
+void pre_parse_cleanup(t_sh_data **sh, t_env **header, char ***org);
+
+
 
 //utils/env_utils.c
 t_env	*env_create_node(char *var_name, char *var_content);
 void	env_add_node(t_env **header, t_env *new_node);
 
 //utils/input_utils.c
-int	bad_initial_char(char *line);
-int	bad_final_char(char *line);
+int	bad_initial_char(char *line, t_sh_data **sh);
+int	bad_final_char(char *line, t_sh_data **sh);
 int is_open_quotes(char *line);
 int	is_space(char *line);
-int invalid_sequence(char *line);
+int invalid_sequence(char *line, int i, int count);
 
 //utils/input_utils2.c
 void skip_spaces(char *str, int *index);
 void skip_quotes(char *str, int *index);
 int	space_and_chars(char *line);
 int sized2_invalid(char *line);
+int valid_not_implemented(char *line);
 
 //utils/parsing_utils.c
 void	remove_quotes(char *element);
