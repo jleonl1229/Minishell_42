@@ -30,6 +30,27 @@ void free_env_list(t_env *head)
     }
 }
 
+void    free_parsing_list(t_sh_data **sh)
+{
+    t_parsed_data *current;
+    t_parsed_data *next_node;
+
+    current = (*sh)->parsed_header;
+
+    while(current != NULL)
+    {
+        next_node = current->next;
+        free(current->cmd);
+        free_matrix(current->args);
+        free(current->simple_in_redir);
+        free(current->simple_out_redir);
+        free(current->append);
+        free(current->here_doc);
+        free(current);
+        current = next_node;
+    }
+}
+
 /*
 **  function called when dup_env(), bad_initial_char() or bad_final_char() error
 **

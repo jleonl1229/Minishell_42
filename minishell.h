@@ -47,7 +47,7 @@ typedef struct s_sh_data
 //parsing/parsing.c
 char **split_by_pipe(char *line, int start, int segment_index, int i);
 void parse_line(  t_parsed_data **head, char **pipe_segment);
-t_parsed_data *parsing(t_sh_data *sh, char *line);
+t_parsed_data *parsing(t_sh_data **sh, char *line);
 
 //shell_init/shell_init.c
 t_env *dup_env(char **envp, t_env *header, t_sh_data **sh);
@@ -72,6 +72,7 @@ void	argc_checker(int argc, t_sh_data **sh);
 char	**free_matrix(char **pointer);
 void free_env_list(t_env *head);
 void pre_parse_cleanup(t_sh_data **sh, t_env **header, char ***org);
+void    free_parsing_list(t_sh_data **sh);
 
 
 
@@ -104,7 +105,7 @@ char	**ft_split_quotes(const char *s, char c);
 int is_special_char(char c) ;
 int new_line_length(char *line, int len, int in_dquote, int in_squote);
 void fill_new_line(char **new_line, char *line, int in_squote, int in_dquote);
-void add_space(t_sh_data *sh, char *line);
+void add_space(t_sh_data **sh, char *line);
 
 //utils/parsing_utils3.c
 void parse_add_node(t_parsed_data **head, t_parsed_data *new_node);

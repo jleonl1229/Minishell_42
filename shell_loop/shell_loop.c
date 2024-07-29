@@ -7,22 +7,15 @@ int append_line(t_sh_data *sh, char *line)
     int len;
 
     len = ft_strlen(sh->prev_line) + ft_strlen(line) + 1;
-    if (sh->prev_line != NULL)
-    {
-        new_line = malloc(len);
-        if (new_line == NULL)
-            pre_parse_cleanup(&sh, NULL, NULL);
-        ft_strlcpy(new_line, sh->prev_line, len);
-        ft_strlcat(new_line, line, len);
-        add_history(new_line);
-        free(sh->prev_line);
-        sh->prev_line = new_line;
-    } 
-    else 
-    {
-        add_history(line);
-        sh->prev_line = ft_strdup(line);
-    }
+    new_line = malloc(len);
+    if (new_line == NULL)
+        pre_parse_cleanup(&sh, NULL, NULL);
+    ft_strlcpy(new_line, sh->prev_line, len);
+    ft_strlcat(new_line, line, len);
+    add_history(new_line);
+    free(sh->prev_line);
+    sh->prev_line = new_line;
+
     return 0;
 }
 
@@ -34,7 +27,8 @@ int save_to_history(t_sh_data *sh, char *line, int e_pipe)
             append_line(sh, line);
         else
         {
-            if (sh->prev_line == NULL || ft_strncmp(line, sh->prev_line, ft_strlen(line)) != 0) 
+            if (sh->prev_line == NULL || (ft_strncmp(line, sh->prev_line, ft_strlen(sh->prev_line)) != 0
+            || ft_strncmp(line, sh->prev_line, ft_strlen(line)) != 0))
             {
                 add_history(line);
                 free(sh->prev_line);
@@ -79,7 +73,29 @@ void shell_loop(t_sh_data **sh)
             e_pipe = 1;
             continue;
         }
-        //sh->parsed_header = parsing(sh, (*sh)->prev_line);
+        (*sh)->parsed_header = parsing(sh, (*sh)->prev_line); //(*sh)->prev_line as parameter can be ommited
+        printf("sh->parsed_header is: %s\n", (char *)(*sh)->parsed_header);
+
+        //int i;
+        /*while((*sh)->parsed_header != NULL)
+        {
+            printf("sh->parsed_header->cmd is: %s\n", (*sh)->parsed_header->cmd);
+            i = 0;
+            while((*sh)->parsed_header->args[i] != NULL)
+            {
+                printf("sh->parsed_header->args %d is: %s\n", i, (*sh)->parsed_header->args[i]);
+                i++;
+            }
+            printf("sh->parsed_header->simple_in_redir is: %s\n", (*sh)->parsed_header->simple_in_redir);
+            printf("sh->parsed_header->simple_out_redir is: %s\n", (*sh)->parsed_header->simple_out_redir);
+            printf("sh->parsed_header->here_doc is: %s\n", (*sh)->parsed_header->here_doc);
+            printf("sh->parsed_header->append is: %s\n", (*sh)->parsed_header->append);
+            printf("sh->parsed_header->next is: %p\n", (void *)(*sh)->parsed_header->next);           
+            (*sh)->parsed_header = (*sh)->parsed_header->next;
+        }*/
+        free(line);
+        free((*sh)->new_line);
+        (*sh)->new_line = NULL;
         if (ft_strncmp((*sh)->prev_line, "exit", ft_strlen("exit")) == 0)
         {
             write(1, "exit\n", ft_strlen("exit\n"));
@@ -87,29 +103,14 @@ void shell_loop(t_sh_data **sh)
         }
         write(1, (*sh)->prev_line, ft_strlen((*sh)->prev_line));
         write(1, "\n",1);
-
-        /*int i;
-        while(sh->parsed_header != NULL)
-        {
-            printf("sh->parsed_header->cmd is: %s\n", sh->parsed_header->cmd);
-            i = 0;
-            while(sh->parsed_header->args[i] != NULL)
-            {
-                printf("sh->parsed_header->args %d is: %s\n", i, sh->parsed_header->args[i]);
-                i++;
-            }
-            printf("sh->parsed_header->simple_in_redir is: %s\n", sh->parsed_header->simple_in_redir);
-            printf("sh->parsed_header->simple_out_redir is: %s\n", sh->parsed_header->simple_out_redir);
-            printf("sh->parsed_header->here_doc is: %s\n", sh->parsed_header->here_doc);
-            printf("sh->parsed_header->append is: %s\n", sh->parsed_header->append);
-            printf("sh->parsed_header->next is: %p\n", (void *)sh->parsed_header->next);           
-            sh->parsed_header = sh->parsed_header->next;
-        }*/
-        free(line);
     }
     //frees when exiting program successfully
+    printf("sh->parsed_header is: %s\n", (char *)(*sh)->parsed_header);
     free_env_list((*sh)->env_header);
     free((*sh)->prev_line);
+    //printf("sh->parsed_header is: %s\n", (char *)(*sh)->parsed_header);
+    //free_parsing_list(sh);
     free(*sh);
+    
     
 }

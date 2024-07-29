@@ -59,13 +59,18 @@ Returns 0 if not valid
 */
 int input_validation(char *line, t_sh_data **sh)
 {
+    int e_pipe;
+
     if (*line == '\0' || is_space(line) == 1 
     ||is_open_quotes(line) == 1 || valid_not_implemented(line) == 1
-    || bad_initial_char(line, sh) == 1|| bad_final_char(line, sh) == 1 
+    || bad_initial_char(line, sh) == 1
     || invalid_sequence(line, 0, 0) == 1|| space_and_chars(line) == 1 
     || sized2_invalid(line) == 1)
         return 0;
-    if (bad_final_char(line, sh) == 7)  //we have an ending pipe prompt
+    e_pipe = bad_final_char(line, sh);
+    if (e_pipe == 1)
+        return 0;
+    else if (e_pipe == 7) //we have an ending pipe prompt
         return 7;
     return 1;
 }

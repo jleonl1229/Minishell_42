@@ -41,10 +41,10 @@ int	space_and_chars(char *line)
 			c = line[i];
 			i++;
 			skip_spaces(line, &i);
-			if (ft_strchr(special_chars, line[i]) 
+			if (line[i] != '\0' && ft_strchr(special_chars, line[i]) 
 			&& !(c == '|' && (line[i] == '<' || line[i] == '>'))) // "| <" and "| >" doesn't throw syntax error
 			{
-				printf("bash: syntax error near unexpected token '%c'\n", line[i]);
+				printf("bash space_and_chars: syntax error near unexpected token '%c'\n", line[i]);
 				return (1);
 			}
 		}
@@ -69,7 +69,7 @@ int sized2_invalid(char *line)
 	{
 		if(ft_strnstr(line, patterns[i], ft_strlen(line)) != NULL)
 		{
-			printf("bash: syntax error near unexpected token '%c'\n", patterns[i][1]);
+			printf("bash sized2_invalid: syntax error near unexpected token '%c'\n", patterns[i][1]);
 			return (1);
 		}
 

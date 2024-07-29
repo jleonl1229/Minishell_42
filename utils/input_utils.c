@@ -24,7 +24,7 @@ int invalid_sequence(char *line, int i, int count)
             }
             if (count > 3)
 			{
-				printf("bash: syntax error near unexpected token '%c'\n", line[i-1]);
+				printf("bash invalid_sequence: syntax error near unexpected token '%c'\n", line[i-1]);
 				return 1;
 			}
 			else if (count == 3)
@@ -80,22 +80,21 @@ int	bad_final_char(char *line, t_sh_data **sh)
 
 	result = 0;
 	space_chars = " \t\n\v\f\r"; //space in the beginning, rest are 9,10,11,12,13 ASCII
-	sz = ft_strlen(line);
 	trimmed = ft_strtrim((const char *)line, space_chars);
+	sz = ft_strlen(trimmed); //
 	if (trimmed == NULL)
 		pre_parse_cleanup(sh, NULL, NULL);
 	if (trimmed[sz - 1] == '<' || trimmed[sz -1] == '>'/* || trimmed[sz-1] == '|'*/)
 	{
 		c = trimmed[sz -1];
 		result = 1;
-		printf("bash: syntax error near unexpected token '%c'\n", c);
+		printf("bash bad_final_char: syntax error near unexpected token '%c'\n", c);
 	}
 	else if (trimmed[sz-1] == '|')
 		result = 7;
 	free(trimmed);
 	return (result);
 }
-
 
 /*
 variables will be 1 if their type of quote is opened, 0 otherwise.
