@@ -73,11 +73,9 @@ void shell_loop(t_sh_data **sh)
             e_pipe = 1;
             continue;
         }
-        (*sh)->parsed_header = parsing(sh, (*sh)->prev_line); //(*sh)->prev_line as parameter can be ommited
-        printf("sh->parsed_header is: %s\n", (char *)(*sh)->parsed_header);
-
-        //int i;
-        /*while((*sh)->parsed_header != NULL)
+        (*sh)->parsed_header = parsing(*sh); //(*sh)->prev_line as parameter can be ommited
+        /*int i;
+        while((*sh)->parsed_header != NULL)
         {
             printf("sh->parsed_header->cmd is: %s\n", (*sh)->parsed_header->cmd);
             i = 0;
@@ -92,10 +90,12 @@ void shell_loop(t_sh_data **sh)
             printf("sh->parsed_header->append is: %s\n", (*sh)->parsed_header->append);
             printf("sh->parsed_header->next is: %p\n", (void *)(*sh)->parsed_header->next);           
             (*sh)->parsed_header = (*sh)->parsed_header->next;
+             printf("sh->parsed_header is %p\n", (*sh)->parsed_header);
         }*/
         free(line);
         free((*sh)->new_line);
         (*sh)->new_line = NULL;
+        free_parsing_list(sh);
         if (ft_strncmp((*sh)->prev_line, "exit", ft_strlen("exit")) == 0)
         {
             write(1, "exit\n", ft_strlen("exit\n"));
@@ -105,12 +105,10 @@ void shell_loop(t_sh_data **sh)
         write(1, "\n",1);
     }
     //frees when exiting program successfully
-    printf("sh->parsed_header is: %s\n", (char *)(*sh)->parsed_header);
     free_env_list((*sh)->env_header);
     free((*sh)->prev_line);
-    //printf("sh->parsed_header is: %s\n", (char *)(*sh)->parsed_header);
-    //free_parsing_list(sh);
     free(*sh);
+
     
     
 }

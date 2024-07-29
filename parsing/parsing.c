@@ -53,12 +53,13 @@ void parse_line(t_parsed_data **header, char **pipe_segment)
     node->here_doc = NULL;
     node->append = NULL;
     node->next = NULL;
+
     cpy_segment = parse_redir(node, pipe_segment); //fills node with redirection data
     parse_cmd(node, pipe_segment, cpy_segment); //fills node with command data
     parse_add_node(header, node); //add nodes to the bottom of the list
 }
 
-t_parsed_data *parsing(t_sh_data **sh, char *line)
+t_parsed_data *parsing(t_sh_data *sh)
 {
 	char **pipe_segments;
 	int i;
@@ -66,8 +67,8 @@ t_parsed_data *parsing(t_sh_data **sh, char *line)
 	t_parsed_data *head;
 
 	i = 0;
-	add_space(sh, line);
-	pipe_segments = split_by_pipe((*sh)->new_line, 0, 0, 0);
+	add_space(sh);
+	pipe_segments = split_by_pipe(sh->new_line, 0, 0, 0);
 	if(pipe_segments == NULL)
 		exit(1); //pre_parse_cleanup (sh, 0, 0)
     head = NULL;

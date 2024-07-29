@@ -5,7 +5,9 @@ char	**free_matrix(char **pointer)
 	int	i;
 
 	i = 0;
-	while (pointer[i] != NULL)
+    if (pointer == NULL)
+        return NULL;
+    while (pointer[i] != NULL)
 	{
 		free(pointer[i]);
 		++i;
@@ -30,17 +32,23 @@ void free_env_list(t_env *head)
     }
 }
 
+/*
+**  frees every element in t_parsed_struct
+**  to be called at the end of the loop iteration,
+**  before parsing the next user prompt
+*/
 void    free_parsing_list(t_sh_data **sh)
 {
     t_parsed_data *current;
     t_parsed_data *next_node;
 
     current = (*sh)->parsed_header;
-
     while(current != NULL)
     {
         next_node = current->next;
+        //if (current->cmd != NULL)
         free(current->cmd);
+        //if (current->args != NULL) //modified free_matrix by adding pointer == null condition checker
         free_matrix(current->args);
         free(current->simple_in_redir);
         free(current->simple_out_redir);

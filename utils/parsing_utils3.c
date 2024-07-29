@@ -16,7 +16,6 @@
  void parse_add_node(t_parsed_data **head, t_parsed_data *new_node) 
  {
      t_parsed_data *current;
-
      if (*head == NULL) 
          *head = new_node;
      else 
@@ -71,13 +70,25 @@
  void handle_redir(char *redir, char *file, t_parsed_data *parsed_data) //not protecting ft_strdups
  {
      if (ft_strncmp(redir, "<", ft_strlen(redir)) == 0)
-         parsed_data->simple_in_redir = ft_strdup(file);
+     {
+        free(parsed_data->simple_in_redir);
+        parsed_data->simple_in_redir = ft_strdup(file);
+     }
      else if (ft_strncmp(redir, ">", ft_strlen(redir)) == 0)
-         parsed_data->simple_out_redir = ft_strdup(file);
+     {
+        free(parsed_data->simple_out_redir);
+        parsed_data->simple_out_redir = ft_strdup(file);
+     }
      else if (ft_strncmp(redir, ">>", ft_strlen(redir)) == 0)
-         parsed_data->append = ft_strdup(file);
+     {
+        free(parsed_data->append);
+        parsed_data->append = ft_strdup(file);
+     }
      else if (ft_strncmp(redir, "<<", ft_strlen(redir)) == 0)
-         parsed_data->here_doc = ft_strdup(file);
+     {
+        free(parsed_data->here_doc);
+        parsed_data->here_doc = ft_strdup(file);
+     }
  }
 
  /*
@@ -131,11 +142,13 @@
 			count++;
 		i++;
 	}
-	cmd = malloc((count + 1) * sizeof(char *));
+    if (count == 0)
+        return NULL;
+    cmd = malloc((count + 1) * sizeof(char *));
 	if (cmd == NULL)
 		exit(1);
 	cmd[count] = NULL;
-     return cmd;
+    return cmd;
  }
 
  /*
@@ -154,6 +167,11 @@
      i = 0;
      j = 0;
      cmd = cmd_arr(cpy_segment);
+     if (cmd == NULL)
+     {
+        free_matrix(cpy_segment);
+        return;
+     }
      while(segment[i] != NULL)
      {
          if (ft_strncmp(cpy_segment[i], "1", ft_strlen(cpy_segment[i])) == 0)
