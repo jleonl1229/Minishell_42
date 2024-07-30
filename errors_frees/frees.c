@@ -10,9 +10,11 @@ char	**free_matrix(char **pointer)
     while (pointer[i] != NULL)
 	{
 		free(pointer[i]);
+        pointer[i] = NULL;
 		++i;
 	}
 	free(pointer);
+    pointer = NULL;
 	return (NULL);
 }
 
@@ -76,7 +78,18 @@ void pre_parse_cleanup(t_sh_data **sh, t_env **header, char ***org)
     free(*sh);
     printf("malloc error\n");
     exit(1);
- 
+}
+
+void parsing_cleanup(t_sh_data **sh, char **pipe_segments, char **split_space)
+{
+    free((*sh)->new_line);
+    if (pipe_segments != NULL)
+        free_matrix(pipe_segments);
+    if (split_space != NULL)
+        free_matrix(split_space);
+    pre_parse_cleanup(sh, 0, 0);
+
+
 }
 
 /*TO BE ADDED HERE: Think which functions are in need

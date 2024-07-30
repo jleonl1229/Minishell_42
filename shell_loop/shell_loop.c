@@ -92,6 +92,7 @@ void shell_loop(t_sh_data **sh)
             (*sh)->parsed_header = (*sh)->parsed_header->next;
              printf("sh->parsed_header is %p\n", (*sh)->parsed_header);
         }*/
+        //frees before starting loop again
         free(line);
         free((*sh)->new_line);
         (*sh)->new_line = NULL;

@@ -43,7 +43,7 @@
          size++;
      cpy_segment = (char **)malloc((size + 1) * sizeof(char *));
      if (cpy_segment == NULL) 
-         exit(1);
+         return NULL;
      return cpy_segment;
  }
 
@@ -54,41 +54,65 @@
  **                   by alloc_cpy_segment()
  ** auxiliary to parse_redir()
  */
- void mod_cpy_segment(char ***cpy_segment, int *i)
+ int mod_cpy_segment(char **cpy_segment, int i, t_parsed_data *parsed_data, char **segment)
  {
-     (*cpy_segment)[*i] = ft_strdup("0");
-     (*cpy_segment)[*i + 1] = ft_strdup("0");
-     if ((*cpy_segment)[*i] == NULL || (*cpy_segment)[*i + 1] == NULL)
-         exit(1);
-     *i += 2;
+    while (segment[i] != NULL) 
+    {
+        if (ft_strncmp(segment[i], "<", ft_strlen(segment[i])) == 0
+        || ft_strncmp(segment[i], ">", ft_strlen(segment[i])) == 0
+        || ft_strncmp(segment[i], "<<", ft_strlen(segment[i])) == 0
+        || ft_strncmp(segment[i], ">>", ft_strlen(segment[i])) == 0)
+        {
+            if (handle_redir(segment[i], segment[i+1], parsed_data) == 0 )
+            {
+                cpy_segment[i] = NULL;
+                return -1;
+            }
+            cpy_segment[i] = ft_strdup("0");
+            cpy_segment[i + 1] = ft_strdup("0");
+            if (cpy_segment[i] == NULL || cpy_segment[i + 1] == NULL)
+                return -1;
+            i += 2;
+        }
+        else
+            if ((cpy_segment[i++] = ft_strdup("1")) == NULL)
+                return -1;
+    }
+    cpy_segment[i] = NULL;
+    return 0;
  }
 
  /*
  **  fills t_parsed_data struct with redirections data
  ** auxiliary to parse_redir()
  */
- void handle_redir(char *redir, char *file, t_parsed_data *parsed_data) //not protecting ft_strdups
+ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
  {
-     if (ft_strncmp(redir, "<", ft_strlen(redir)) == 0)
-     {
+    if (ft_strncmp(redir, "<", ft_strlen(redir)) == 0)
+    {
         free(parsed_data->simple_in_redir);
-        parsed_data->simple_in_redir = ft_strdup(file);
-     }
-     else if (ft_strncmp(redir, ">", ft_strlen(redir)) == 0)
-     {
+        if ((parsed_data->simple_in_redir = ft_strdup(file)) == NULL)
+            return 0;
+    }
+    else if (ft_strncmp(redir, ">", ft_strlen(redir)) == 0)
+    {
         free(parsed_data->simple_out_redir);
-        parsed_data->simple_out_redir = ft_strdup(file);
-     }
-     else if (ft_strncmp(redir, ">>", ft_strlen(redir)) == 0)
-     {
+        if((parsed_data->simple_out_redir = ft_strdup(file)) == NULL)
+            return 0;
+    }
+    else if (ft_strncmp(redir, ">>", ft_strlen(redir)) == 0)
+    {
         free(parsed_data->append);
-        parsed_data->append = ft_strdup(file);
-     }
-     else if (ft_strncmp(redir, "<<", ft_strlen(redir)) == 0)
-     {
+        if ((parsed_data->append = ft_strdup(file)) == NULL)
+            return 0;
+    }
+    else if (ft_strncmp(redir, "<<", ft_strlen(redir)) == 0)
+    {
         free(parsed_data->here_doc);
-        parsed_data->here_doc = ft_strdup(file);
-     }
+        if ((parsed_data->here_doc = ft_strdup(file)) == NULL)
+            return 0;
+    }
+    return 1;
  }
 
  /*
@@ -96,32 +120,30 @@
  **  and fills a copy of char **segment with modified data to ignore
  **  already parsed data
  */
- char **parse_redir(t_parsed_data *parsed_data, char **segment)
+ char **parse_redir(t_parsed_data *parsed_data, char **split_space)
   {
-     int i;
-     char **cpy_segment;
-
-     i = 0;
-     cpy_segment = alloc_cpy_segment(segment);
-     while (segment[i] != NULL) 
-     {
-		if (ft_strncmp(segment[i], "<", ft_strlen(segment[i])) == 0
-		 || ft_strncmp(segment[i], ">", ft_strlen(segment[i])) == 0
-         || ft_strncmp(segment[i], "<<", ft_strlen(segment[i])) == 0
-		 || ft_strncmp(segment[i], ">>", ft_strlen(segment[i])) == 0)
-         {
-             handle_redir(segment[i], segment[i+1], parsed_data);
-             mod_cpy_segment(&cpy_segment, &i);
-         }
-         else 
-         {
-             cpy_segment[i] = ft_strdup("1");
-             i++;
-         }
-     }
-     cpy_segment[i] = NULL;  //Null-terminate the new array
+    int i;
+    int sentinel;
+    char **cpy_segment;
+    
+    i = 0;
+    cpy_segment = alloc_cpy_segment(split_space);
+    if (cpy_segment == NULL)
+        return NULL;
+    sentinel =  mod_cpy_segment(cpy_segment, i, parsed_data, split_space);
+    if (sentinel == -1)
+    {
+        free(parsed_data->simple_in_redir);
+        free(parsed_data->simple_out_redir);
+        free(parsed_data->append);
+        free(parsed_data->here_doc);
+        free_matrix(cpy_segment);
+        return NULL;
+    }
      return cpy_segment;
  }
+
+
 
  /*
  **  iterates over cpy_segment and returns a new array

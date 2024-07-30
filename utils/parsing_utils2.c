@@ -80,16 +80,21 @@
  */
  void add_space(t_sh_data *sh)
  {
-     int new_len;
-     char *new_line;
-     int len;
-
-     len = ft_strlen(sh->prev_line);
-     new_len = new_line_length(sh->prev_line, len, 0, 0);
-     new_line = malloc(new_len + 1);
-     if (new_line == NULL)
-         exit(1); //pre_parse_cleanup (sh, 0, 0)
-     fill_new_line(&new_line, sh->prev_line, 0, 0);
-     sh->new_line = ft_strdup(new_line);
-	 free(new_line);
+    int new_len;
+    char *new_line;
+    int len;
+    
+    len = ft_strlen(sh->prev_line);
+    new_len = new_line_length(sh->prev_line, len, 0, 0);
+    new_line = malloc(new_len + 1);
+    if (new_line == NULL)
+        pre_parse_cleanup (&sh, 0, 0);
+    fill_new_line(&new_line, sh->prev_line, 0, 0);
+    sh->new_line = ft_strdup(new_line);
+    if (sh->new_line == NULL)
+    {
+        free(new_line);
+        pre_parse_cleanup (&sh, 0, 0);
+    }
+    free(new_line);
  }

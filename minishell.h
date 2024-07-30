@@ -46,7 +46,7 @@ typedef struct s_sh_data
 
 //parsing/parsing.c
 char **split_by_pipe(char *line, int start, int segment_index, int i);
-void parse_line(  t_parsed_data **head, char **pipe_segment);
+void parse_line(t_sh_data **sh, t_parsed_data **header, char **split_space, char **pipe_segments);
 t_parsed_data *parsing(t_sh_data *sh);
 
 //shell_init/shell_init.c
@@ -73,6 +73,7 @@ char	**free_matrix(char **pointer);
 void free_env_list(t_env *head);
 void pre_parse_cleanup(t_sh_data **sh, t_env **header, char ***org);
 void    free_parsing_list(t_sh_data **sh);
+void parsing_cleanup(t_sh_data **sh, char **pipe_segments, char **split_space);
 
 //utils/env_utils.c
 t_env	*env_create_node(char *var_name, char *var_content);
@@ -108,9 +109,9 @@ void add_space(t_sh_data *sh);
 //utils/parsing_utils3.c
 void parse_add_node(t_parsed_data **head, t_parsed_data *new_node);
 char **alloc_cpy_segment(char **segment);
-void mod_cpy_segment(char ***cpy_segment, int *i);
-void handle_redir(char *redir, char *file, t_parsed_data *parsed_data);
-char **parse_redir(t_parsed_data *parsed_data, char **segment);
+int mod_cpy_segment(char **cpy_segment, int i, t_parsed_data *parsed_data, char **segment);
+int handle_redir(char *redir, char *file, t_parsed_data *parsed_data);
+char **parse_redir(t_parsed_data *parsed_data, char **split_space);
 char **cmd_arr(char **cpy_segment);
 void parse_cmd(t_parsed_data *node, char **segment, char **cpy_segment);
 

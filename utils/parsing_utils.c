@@ -129,7 +129,7 @@
  		substr_length = count_char(s, c);
  		pointer[i] = malloc(sizeof(char) * (substr_length + 1));
  		if (pointer[i] == NULL)
- 			return NULL; 
+ 			return free_matrix(pointer); 
  		ft_strlcpy(pointer[i], s, substr_length + 1);
  		s += substr_length;
  		i++;
