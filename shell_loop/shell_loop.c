@@ -107,7 +107,7 @@ void shell_loop(t_sh_data **sh)
     }
     //frees when exiting program successfully
     free_env_list((*sh)->env_header);
-    free((*sh)->prev_line);
+   free((*sh)->prev_line);
     free(*sh);
 
     
