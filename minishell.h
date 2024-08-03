@@ -49,6 +49,12 @@ char **split_by_pipe(char *line, int start, int segment_index, int i);
 void parse_line(t_sh_data **sh, t_parsed_data **header, char **split_space, char **pipe_segments);
 t_parsed_data *parsing(t_sh_data *sh);
 
+//parsing/env_parsing.c
+char	*expanded_var (char **env_pair, char *input, int *start);
+char **get_var_content(char *input, int start, t_env *head);
+char *act_on_dollar(char *input, int *j, t_env *env_list);
+char  **env_parse (int single_q, int double_q, char **input, t_env *env_list );
+
 //shell_init/shell_init.c
 t_env *dup_env(char **envp, t_env *header, t_sh_data **sh);
 void shell_init(t_sh_data **sh, char **envp);
@@ -78,6 +84,8 @@ void parsing_cleanup(t_sh_data **sh, char **pipe_segments, char **split_space);
 //utils/env_utils.c
 t_env	*env_create_node(char *var_name, char *var_content);
 void	env_add_node(t_env **header, t_env *new_node);
+int env_quotes(char c, int *single_q, int *double_q, int *j);
+char *find_env_pair(t_env *head, char *var_name);
 
 //utils/input_utils.c
 int	bad_initial_char(char *line, t_sh_data **sh);

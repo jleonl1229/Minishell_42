@@ -74,7 +74,7 @@ void shell_loop(t_sh_data **sh)
             continue;
         }
         (*sh)->parsed_header = parsing(*sh); //(*sh)->prev_line as parameter can be ommited
-        /*int i;
+        int i;
         while((*sh)->parsed_header != NULL)
         {
             printf("sh->parsed_header->cmd is: %s\n", (*sh)->parsed_header->cmd);
@@ -91,7 +91,7 @@ void shell_loop(t_sh_data **sh)
             printf("sh->parsed_header->next is: %p\n", (void *)(*sh)->parsed_header->next);           
             (*sh)->parsed_header = (*sh)->parsed_header->next;
              printf("sh->parsed_header is %p\n", (*sh)->parsed_header);
-        }*/
+        }
         //frees before starting loop again
         free(line);
         free((*sh)->new_line);

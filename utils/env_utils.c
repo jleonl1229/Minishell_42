@@ -1,7 +1,48 @@
 #include "../minishell.h"
 
-/*Need to manage memory allocated in ft_strdup!!
+/*
+** auxiliary to env_parse()
 */
+int env_quotes(char c, int *single_q, int *double_q, int *j)
+{
+	if (c == '\"' && *single_q == 0) 
+	{
+        *double_q = !*double_q;
+		(*j)++;
+		return 1;
+	}
+    else if (c == '\'' && *double_q == 0) 
+	{
+        *single_q = !*single_q;
+		(*j)++;
+		return 1;
+    }
+	
+	return 0;
+}
+
+
+
+/*
+**	auxiliary to env_parse()
+*/
+char *find_env_pair(t_env *head, char *var_name) 
+{
+    t_env *current = head;
+    while (current != NULL) 
+	{
+        if (strncmp(current->env_name, var_name, strlen(var_name)) == 0 
+		&& strncmp(current->env_name, var_name, strlen(current->env_name)) == 0) //ft_strncmp
+        {
+            free(var_name);
+            return strdup(current->env_value);
+        }
+		current = current->next;
+    }
+    free(var_name);
+    return strdup("");
+}
+
 t_env	*env_create_node(char *var_name, char *var_content)
 {
 	t_env	*new_node;
