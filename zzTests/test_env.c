@@ -7,7 +7,7 @@
 */
 
 // Node structure for linked list
-/*typedef struct EnvNode {
+typedef struct EnvNode {
     char *var_name;
     char *var_content;
     struct EnvNode *next;
@@ -67,7 +67,10 @@ char *find_env_pair(EnvNode *head, char *var_name)
 		&& strncmp(current->var_name, var_name, strlen(current->var_name)) == 0) //ft_strncmp
         {
             free(var_name);
-            return strdup(current->var_content);
+			if (current->var_content != NULL)
+				return strdup(current->var_content);
+			else
+				return strdup("");
         }
 		current = current->next;
     }
@@ -221,9 +224,9 @@ void print_expanded(char **input) {
 }
 
 int main() {
-    char *input[] = {strdup("$S\'H\'LVL$PATH"), NULL};
+    char *input[] = {strdup("$CASIO"), NULL};
     // Example linked list for environment variables
-	EnvNode shlvl = {strdup("SHLVL"), strdup("1"), NULL};
+	EnvNode shlvl = {strdup("SHLVL"), strdup(""), NULL};
 	EnvNode path = {strdup("PATH"), strdup("/usr/bin"), NULL};
 	//EnvNode user = {strdup("USER1234"), strdup("mikel"), NULL};
     shlvl.next = &path;
@@ -240,7 +243,7 @@ int main() {
    }
 
     return 0;
-}*/
+}
 
 
 

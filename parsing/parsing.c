@@ -31,6 +31,22 @@ char **split_by_pipe(char *line, int start, int segment_index, int i)
     return result;
 }
 
+/*
+**  auxiliary to parse_line()
+*/
+void parsed_node_init(t_parsed_data *node)
+{
+    node->path = NULL; //could use an initi funct for these
+    node->cmd = NULL;
+    node->args = NULL;
+    node->simple_in_redir = -2; //useful value to check at execution
+    node->simple_out_redir = -2;
+    node->here_doc = NULL;
+    node->append = 1;
+    node->next = NULL;
+
+}
+
 /* 
     *initializes a new t_parsed_data node and handles functions to fill the node with data
     *   @param: an array of strings, representing a pipe segment
@@ -45,21 +61,16 @@ void parse_line(t_sh_data **sh, t_parsed_data **header, char **split_space, char
     node = (t_parsed_data *)malloc(sizeof(t_parsed_data)); // to be freed with list
 	if (node == NULL)
 		parsing_cleanup(sh, pipe_segments, split_space);
-	node->path = NULL;
-    node->cmd = NULL;
-    node->args = NULL;
-    node->simple_in_redir = NULL;
-    node->simple_out_redir = NULL;
-    node->here_doc = NULL;
-    node->append = NULL;
-    node->next = NULL;
+    parsed_node_init(node);
     cpy_segment = parse_redir(node, split_space);
     if (cpy_segment == NULL)
     {
         free(node);
         parsing_cleanup(sh, pipe_segments, split_space);
     }
-    parse_cmd(node, split_space, cpy_segment); //fills node with command data
+    printf("in parse_line\n");
+    if (parse_cmd_and_path(*sh, node, split_space, cpy_segment) == 0)
+        printf("to be done\n");
     parse_add_node(header, node); //add nodes to the bottom of the list
 }
 
@@ -83,17 +94,10 @@ t_parsed_data *parsing(t_sh_data *sh)
             parsing_cleanup(&sh, pipe_segments, 0);
         split_space = env_parse (0, 0, split_space, sh->env_header);
         if (split_space == NULL)
-            //fiesta
+            printf("split_space after env_parse is null\n");
 		parse_line(&sh, &head, split_space, pipe_segments);
         free_matrix(split_space); 
 	}
     free_matrix(pipe_segments);
     return head;
 }
-
-
-// Input: ["hello", "$PATH", "echo", NULL]
-
-//modify split space in the function
-
-//

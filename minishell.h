@@ -27,10 +27,10 @@ typedef struct s_parsed_data
     char *path; //absolute path to executable
     char *cmd; //executable command, without args
     char **args; //command args
-    char *simple_in_redir; //filename where stdin is redirected from
-    char *simple_out_redir; //filename where stdout is redirected to
-    char *here_doc; //delimiter to handle here_doc feature
-    char *append; //filename to handle append redirection to stdout
+    int     simple_in_redir; //fd where stdin is redirected from
+    int     simple_out_redir; //fd where stdout is redirected to
+    t_list *here_doc; //delimiter to handle here_doc feature
+    int     append; //filename to handle append redirection to stdout
     struct s_parsed_data *next;
 } t_parsed_data;
 
@@ -76,6 +76,7 @@ void	argc_checker(int argc, t_sh_data **sh);
 
 //errors_frees/frees.c
 char	**free_matrix(char **pointer);
+void free_tlist(t_list *header);
 void free_env_list(t_env *head);
 void pre_parse_cleanup(t_sh_data **sh, t_env **header, char ***org);
 void    free_parsing_list(t_sh_data **sh);
@@ -118,8 +119,12 @@ void add_space(t_sh_data *sh);
 void parse_add_node(t_parsed_data **head, t_parsed_data *new_node);
 char **alloc_cpy_segment(char **segment);
 int mod_cpy_segment(char **cpy_segment, int i, t_parsed_data *parsed_data, char **segment);
+int redir_fd(int *redir, char *file, char *redir_type);
 int handle_redir(char *redir, char *file, t_parsed_data *parsed_data);
 char **parse_redir(t_parsed_data *parsed_data, char **split_space);
 char **cmd_arr(char **cpy_segment);
-void parse_cmd(t_parsed_data *node, char **segment, char **cpy_segment);
-
+int fill_cmd_and_args(int i, int j, t_parsed_data *node, char **cmd);
+char *path_is_exec(t_parsed_data *node, char **env_value );
+char    **extract_path(t_sh_data *sh);
+int fill_path(t_sh_data *sh, t_parsed_data *node);
+int parse_cmd_and_path(t_sh_data *sh, t_parsed_data *node, char **segment, char **cpy_segment);

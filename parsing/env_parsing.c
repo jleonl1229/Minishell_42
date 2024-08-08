@@ -13,7 +13,9 @@ char	*expanded_var (char **env_pair, char *input, int *start)
 		return NULL;
 	(*start)++;
 	vname_len = strlen(env_pair[0]) + 1; // + 1 to include '$'
-	if (vname_len == 1)
+	if (vname_len == 1 && ft_strlen(input) != 1 && ft_strncmp(input, "$", ft_strlen("$")) == 0)
+		return strdup(input +1);
+	else if (vname_len ==1)
 		return strdup(input);
 	exp_len = strlen(env_pair[1]);
 	new_len = strlen(input) - vname_len + exp_len;

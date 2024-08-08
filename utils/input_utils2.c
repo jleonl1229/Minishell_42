@@ -16,8 +16,8 @@ void skip_quotes(char *str, int *index)
     (*index)++;
     while (str[*index] != '\0' && str[*index] != quote_char)
         (*index)++;
-   //if (str[*index] == quote_char) //skip closing quote
-        //(*index)++;
+  // if (str[*index] == quote_char) //skip closing quote
+      //  (*index)++;
 }
 
 /*
@@ -36,7 +36,7 @@ int	space_and_chars(char *line)
 	{
 		if (line[i] == 39 || line[i] == 34) //double or single quotes
 			skip_quotes(line, &i);
-		if (ft_strchr(special_chars, line[i]) && line[i + 1] == ' ')
+		if (line[i] != '\0' && line[i + 1] == ' ' && ft_strchr(special_chars, line[i]))
 		{
 			c = line[i];
 			i++;

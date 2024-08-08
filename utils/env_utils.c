@@ -35,12 +35,15 @@ char *find_env_pair(t_env *head, char *var_name)
 		&& strncmp(current->env_name, var_name, strlen(current->env_name)) == 0) //ft_strncmp
         {
             free(var_name);
-            return strdup(current->env_value);
+			if (current->env_value != NULL)
+				return strdup(current->env_value);
+			else
+				return strdup("\"\"");
         }
 		current = current->next;
     }
     free(var_name);
-    return strdup("");
+    return strdup("\"\"");
 }
 
 t_env	*env_create_node(char *var_name, char *var_content)

@@ -77,17 +77,29 @@ void shell_loop(t_sh_data **sh)
         int i;
         while((*sh)->parsed_header != NULL)
         {
+            printf("sh->parsed_header->path is: %s\n", (*sh)->parsed_header->path);
             printf("sh->parsed_header->cmd is: %s\n", (*sh)->parsed_header->cmd);
             i = 0;
-            while((*sh)->parsed_header->args[i] != NULL)
+            if ((*sh)->parsed_header->args != NULL)
+                printf("sh->parsed_header->args[0] is: %p\n", (*sh)->parsed_header->args);
+            if ((*sh)->parsed_header->args != NULL)
             {
-                printf("sh->parsed_header->args %d is: %s\n", i, (*sh)->parsed_header->args[i]);
-                i++;
+                while((*sh)->parsed_header->args[i] != NULL)
+                {
+                    printf("sh->parsed_header->args %d is: %s\n", i, (*sh)->parsed_header->args[i]);
+                    i++;
+                }
             }
-            printf("sh->parsed_header->simple_in_redir is: %s\n", (*sh)->parsed_header->simple_in_redir);
-            printf("sh->parsed_header->simple_out_redir is: %s\n", (*sh)->parsed_header->simple_out_redir);
-            printf("sh->parsed_header->here_doc is: %s\n", (*sh)->parsed_header->here_doc);
-            printf("sh->parsed_header->append is: %s\n", (*sh)->parsed_header->append);
+            printf("sh->parsed_header->simple_in_redir is: %d\n", (*sh)->parsed_header->simple_in_redir);
+            printf("sh->parsed_header->simple_out_redir is: %d\n", (*sh)->parsed_header->simple_out_redir);
+            t_list *temp;
+            temp = (*sh)->parsed_header->here_doc;
+            while (temp != NULL)
+            {
+                printf("sh->parsed_header->here_doc is: %s\n", (char *)temp->content);
+                temp = temp->next;
+            }
+            printf("sh->parsed_header->append is: %d\n", (*sh)->parsed_header->append);
             printf("sh->parsed_header->next is: %p\n", (void *)(*sh)->parsed_header->next);           
             (*sh)->parsed_header = (*sh)->parsed_header->next;
              printf("sh->parsed_header is %p\n", (*sh)->parsed_header);

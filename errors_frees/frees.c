@@ -18,6 +18,21 @@ char	**free_matrix(char **pointer)
 	return (NULL);
 }
 
+void free_tlist(t_list *header)
+{
+    t_list *temp;
+
+    if (header == NULL)
+        return;
+    while (header != NULL)
+    {
+        temp = header->next;
+        free(header->content);
+        free(header);
+        header = temp;
+    }
+}
+
 void free_env_list(t_env *head) 
 {
     t_env *current;
@@ -51,11 +66,7 @@ void    free_parsing_list(t_sh_data **sh)
         //if (current->cmd != NULL)
         free(current->cmd);
         //if (current->args != NULL) //modified free_matrix by adding pointer == null condition checker
-        free_matrix(current->args);
-        free(current->simple_in_redir);
-        free(current->simple_out_redir);
-        free(current->append);
-        free(current->here_doc);
+        free_tlist(current->here_doc);
         free(current);
         current = next_node;
     }
