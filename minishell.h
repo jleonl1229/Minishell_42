@@ -125,7 +125,7 @@ void parse_add_node(t_parsed_data **head, t_parsed_data *new_node);
 char **alloc_cpy_segment(char **segment);
 int mod_cpy_segment(char **cpy_segment, int i, t_parsed_data *parsed_data, char **segment);
 int redir_fd(int *redir, char *file, char *redir_type);
-int handle_redir(int last, char *redir, char *file, t_parsed_data *parsed_data);
+int handle_redir(char *redir, char *file, t_parsed_data *parsed_data);
 char **parse_redir(t_parsed_data *parsed_data, char **split_space);
 char **cmd_arr(char **cpy_segment);
 int fill_cmd_and_args(int i, int j, t_parsed_data *node, char **cmd);

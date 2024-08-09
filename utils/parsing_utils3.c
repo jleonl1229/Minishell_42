@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 11:44:20 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/08/09 11:59:02 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/08/09 12:36:55 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@
         || ft_strncmp(segment[i], "<<", ft_strlen(segment[i])) == 0
         || ft_strncmp(segment[i], ">>", ft_strlen(segment[i])) == 0)
         {
-            if (handle_redir(-7, segment[i], segment[i+1], parsed_data) == 0 )
+            if (handle_redir(segment[i], segment[i+1], parsed_data) == 0 )
             {
                 cpy_segment[i] = NULL;
                 return -1;
@@ -88,7 +88,7 @@
 **  keep listening for new commands
 ** auxiliary to handle_redir()
 */
-int redir_fd(int *redir, char *file, char *redir_type)
+int redir_fd(t_parsed_data *parsed_data, int *redir, char *file, char *redir_type)
 {
     int fd;
 
@@ -107,9 +107,15 @@ int redir_fd(int *redir, char *file, char *redir_type)
     if (ft_strncmp(redir_type, "<", ft_strlen(redir_type)) == 0)
         *redir = open(file, O_RDONLY);
     else if(ft_strncmp(redir_type, ">", ft_strlen(redir_type)) == 0)
+    {
         *redir = open(file, O_CREAT | O_RDWR, 0777);
+        parsed_data->last_fd = *redir;
+    }
     else if (ft_strncmp(redir_type, ">>", ft_strlen(redir_type)) == 0)
+    {
         *redir = open(file, O_CREAT | O_RDWR | O_APPEND, 0777);
+        parsed_data->last_fd = *redir;
+    }
     return 1;
 }
 
@@ -126,11 +132,11 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
 
     node = NULL;
     if (ft_strncmp(redir, "<", ft_strlen(redir)) == 0)
-        return redir_fd(&(parsed_data->simple_in_redir), file, "<");
+        return redir_fd(parsed_data, &(parsed_data->simple_in_redir), file, "<");
     else if (ft_strncmp(redir, ">", ft_strlen(redir)) == 0)
-        return redir_fd(&(parsed_data->simple_out_redir), file, ">");
+        return redir_fd(parsed_data, &(parsed_data->simple_out_redir), file, ">");
     else if (ft_strncmp(redir, ">>", ft_strlen(redir)) == 0)
-        return redir_fd(&(parsed_data->append), file, ">>");
+        return redir_fd(parsed_data, &(parsed_data->append), file, ">>");
     else if (ft_strncmp(redir, "<<", ft_strlen(redir)) == 0)
     {
         node = malloc(sizeof(t_list));
