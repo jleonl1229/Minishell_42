@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 11:44:20 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/07/29 12:42:19 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/08/09 11:59:02 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@
         || ft_strncmp(segment[i], "<<", ft_strlen(segment[i])) == 0
         || ft_strncmp(segment[i], ">>", ft_strlen(segment[i])) == 0)
         {
-            if (handle_redir(segment[i], segment[i+1], parsed_data) == 0 )
+            if (handle_redir(-7, segment[i], segment[i+1], parsed_data) == 0 )
             {
                 cpy_segment[i] = NULL;
                 return -1;
@@ -114,7 +114,7 @@ int redir_fd(int *redir, char *file, char *redir_type)
 }
 
  /*
- **  fills t_parsed_data struct with redirections data
+ ** fills t_parsed_data struct with redirections data
  ** it can return -1 if malloc errors, 0 if close() errors in redir_fd()
  ** or 1 if everything is okay (open () failing also return 1, because it will
  ** be handled in execution)
@@ -127,13 +127,10 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
     node = NULL;
     if (ft_strncmp(redir, "<", ft_strlen(redir)) == 0)
         return redir_fd(&(parsed_data->simple_in_redir), file, "<");
-
     else if (ft_strncmp(redir, ">", ft_strlen(redir)) == 0)
         return redir_fd(&(parsed_data->simple_out_redir), file, ">");
-
     else if (ft_strncmp(redir, ">>", ft_strlen(redir)) == 0)
         return redir_fd(&(parsed_data->append), file, ">>");
-
     else if (ft_strncmp(redir, "<<", ft_strlen(redir)) == 0)
     {
         node = malloc(sizeof(t_list));

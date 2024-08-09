@@ -74,6 +74,7 @@ void shell_loop(t_sh_data **sh)
             continue;
         }
         (*sh)->parsed_header = parsing(*sh); //(*sh)->prev_line as parameter can be ommited
+        piping(*sh);
         int i;
         while((*sh)->parsed_header != NULL)
         {
@@ -99,6 +100,7 @@ void shell_loop(t_sh_data **sh)
                 printf("sh->parsed_header->here_doc is: %s\n", (char *)temp->content);
                 temp = temp->next;
             }
+            printf("sh->parsed_header->here_doc is: %p\n", temp);
             printf("sh->parsed_header->append is: %d\n", (*sh)->parsed_header->append);
             printf("sh->parsed_header->next is: %p\n", (void *)(*sh)->parsed_header->next);           
             (*sh)->parsed_header = (*sh)->parsed_header->next;

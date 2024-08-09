@@ -31,6 +31,7 @@ typedef struct s_parsed_data
     int     simple_out_redir; //fd where stdout is redirected to
     t_list *here_doc; //delimiter to handle here_doc feature
     int     append; //filename to handle append redirection to stdout
+    int     last_fd: //last assigned ouput fd, to resolve cases like: "echo "hello" >out >>out1"
     struct s_parsed_data *next;
 } t_parsed_data;
 
@@ -43,6 +44,10 @@ typedef struct s_sh_data
     char *new_line; //user inputed command with spaces around special chars
     t_parsed_data *parsed_header; //pointer to the head of the linked list holding the pipe segments data
 }   t_sh_data;
+
+//execution/execution.c
+void child_process(t_clarg *clarg, t_lcmd *header, int fd[2], char **envp);
+void piping(t_clarg *clarg, char **envp);
 
 //parsing/parsing.c
 char **split_by_pipe(char *line, int start, int segment_index, int i);
@@ -120,7 +125,7 @@ void parse_add_node(t_parsed_data **head, t_parsed_data *new_node);
 char **alloc_cpy_segment(char **segment);
 int mod_cpy_segment(char **cpy_segment, int i, t_parsed_data *parsed_data, char **segment);
 int redir_fd(int *redir, char *file, char *redir_type);
-int handle_redir(char *redir, char *file, t_parsed_data *parsed_data);
+int handle_redir(int last, char *redir, char *file, t_parsed_data *parsed_data);
 char **parse_redir(t_parsed_data *parsed_data, char **split_space);
 char **cmd_arr(char **cpy_segment);
 int fill_cmd_and_args(int i, int j, t_parsed_data *node, char **cmd);

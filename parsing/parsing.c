@@ -42,7 +42,7 @@ void parsed_node_init(t_parsed_data *node)
     node->simple_in_redir = -2; //useful value to check at execution
     node->simple_out_redir = -2;
     node->here_doc = NULL;
-    node->append = 1;
+    node->append = -2;
     node->next = NULL;
 
 }
