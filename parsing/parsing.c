@@ -38,7 +38,6 @@ void parsed_node_init(t_parsed_data *node)
 {
     node->path = NULL; //could use an initi funct for these
     node->cmd = NULL;
-    node->args = NULL;
     node->simple_in_redir = -2; //useful value to check at execution
     node->simple_out_redir = -2;
     node->here_doc = NULL;

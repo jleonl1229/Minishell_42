@@ -63,7 +63,7 @@
         || ft_strncmp(segment[i], "<<", ft_strlen(segment[i])) == 0
         || ft_strncmp(segment[i], ">>", ft_strlen(segment[i])) == 0)
         {
-            if (handle_redir(segment[i], segment[i+1], parsed_data) == 0 )
+            if (handle_redir(segment[i], segment[i+1], parsed_data) != 1)
             {
                 cpy_segment[i] = NULL;
                 return -1;
@@ -99,10 +99,7 @@ int redir_fd(t_parsed_data *parsed_data, int *redir, char *file, char *redir_typ
     {
         fd = close(*redir);
         if (fd == -1)
-        {
-            printf("redir_fd: error closing\n");
-            return 0;
-        }
+            return (printf("redir_fd: error closing\n"));
     }
     if (ft_strncmp(redir_type, "<", ft_strlen(redir_type)) == 0)
         *redir = open(file, O_RDONLY);
@@ -155,7 +152,7 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
  **  already parsed data
  */
  char **parse_redir(t_parsed_data *parsed_data, char **split_space)
-  {
+{
     int i;
     int sentinel;
     char **cpy_segment;
@@ -172,7 +169,7 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
         return NULL;
     }
      return cpy_segment;
- }
+}
 
 
 
@@ -214,28 +211,21 @@ int fill_cmd_and_args(int i, int j, t_parsed_data *node, char **cmd)
 {
     while (cmd[i] != NULL)
         remove_quotes(cmd[i++]);
-    node->args = malloc(i * sizeof(char*));
-    if (node->args == NULL) 
+    node->cmd = malloc(i * sizeof(char*) + 1);
+    if (node->cmd == NULL) 
         return 0;
     i = 0;
-    node->cmd = ft_strdup(cmd[i++]);
-    if (node->cmd == NULL) 
-    {
-        free(node->args);
-        return 0;
-    }
     while (cmd[i] != NULL)
     {
-        node->args[j] = ft_strdup(cmd[i++]);
-        if (node->args[j] == NULL)
+        node->cmd[j] = ft_strdup(cmd[i++]);
+        if (node->cmd[j] == NULL)
          {
-            free(node->cmd);
-            free_matrix(node->args);
+            free_matrix(node->cmd);
             return 0;
         }
         j++;
     }
-    node->args[j] = NULL;
+    node->cmd[j] = NULL;
     return 1;
 }
 

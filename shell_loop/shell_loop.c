@@ -79,15 +79,12 @@ void shell_loop(t_sh_data **sh)
         while((*sh)->parsed_header != NULL)
         {
             printf("sh->parsed_header->path is: %s\n", (*sh)->parsed_header->path);
-            printf("sh->parsed_header->cmd is: %s\n", (*sh)->parsed_header->cmd);
             i = 0;
-            if ((*sh)->parsed_header->args != NULL)
-                printf("sh->parsed_header->args[0] is: %p\n", (*sh)->parsed_header->args);
-            if ((*sh)->parsed_header->args != NULL)
+            if ((*sh)->parsed_header->cmd != NULL)
             {
-                while((*sh)->parsed_header->args[i] != NULL)
+                while((*sh)->parsed_header->cmd[i] != NULL)
                 {
-                    printf("sh->parsed_header->args %d is: %s\n", i, (*sh)->parsed_header->args[i]);
+                    printf("sh->parsed_header->cmd %d is: %s\n", i, (*sh)->parsed_header->cmd[i]);
                     i++;
                 }
             }

@@ -2,23 +2,24 @@
 
 
 
-void child_process(t_sh_data *sh)
+void child_process(t_sh_data *sh, t_parsed_data *header)
 {
     close(fd[0]);
-    if(header->next != NULL)
+    if(header->next != NULL) //more commands coming
     {
         if(dup2(fd[1], STDOUT_FILENO) == -1)
-            cleanup(clarg, DUP2, NULL);
+            printf("child_process(): dup2 failure\n");
     }
-    else if (header->next == NULL)
+    else if (header->next == NULL) //last command
     {
-        if(dup2(clarg->outfile_fd, STDOUT_FILENO) == -1)
-            cleanup(clarg, DUP2, NULL);
+        if (header->simple_out_redir != -2)
+            if(dup2(clarg->outfile_fd, STDOUT_FILENO) == -1)
+                printf("child_process(): dup2-2 failure\n");
     }
     close(fd[1]);
-    close(clarg->outfile_fd);
-    if (execve(header->path_cmd, header->cmd, envp) == -1)
-        cleanup(clarg, EXECVE, NULL);
+    close(header->simple_out_redir);
+    if (execve(header->path, header->cmd, envp) == -1)
+        printf("child_process(): execve failure\n");
 }
 
 void piping(t_sh_data *sh)

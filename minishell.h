@@ -25,8 +25,7 @@ example: echo "hello" > out | cat out", there are 2 t_parsed_data nodes
 typedef struct s_parsed_data
 {
     char *path; //absolute path to executable
-    char *cmd; //executable command, without args
-    char **args; //command args
+    char **cmd; //executable command + its args
     int     simple_in_redir; //fd where stdin is redirected from
     int     simple_out_redir; //fd where stdout is redirected to
     t_list *here_doc; //delimiter to handle here_doc feature
@@ -40,14 +39,15 @@ typedef struct s_parsed_data
 typedef struct s_sh_data
 {
     t_env   *env_header; // pointer to the head of the linked list holding the env vars
+    char **env; //env vars in char ** format. Needed in execve
     char    *prev_line; //last line saved to history
     char *new_line; //user inputed command with spaces around special chars
     t_parsed_data *parsed_header; //pointer to the head of the linked list holding the pipe segments data
 }   t_sh_data;
 
 //execution/execution.c
-void child_process(t_clarg *clarg, t_lcmd *header, int fd[2], char **envp);
-void piping(t_clarg *clarg, char **envp);
+void child_process(t_sh_data *sh, t_parsed_data *header);
+void piping(t_sh_data *sh);
 
 //parsing/parsing.c
 char **split_by_pipe(char *line, int start, int segment_index, int i);
