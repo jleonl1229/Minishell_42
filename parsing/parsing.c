@@ -39,9 +39,8 @@ void parsed_node_init(t_parsed_data *node)
     node->path = NULL; //could use an initi funct for these
     node->cmd = NULL;
     node->simple_in_redir = -2; //useful value to check at execution
-    node->simple_out_redir = -2;
+    node ->last_fd = -2;
     node->here_doc = NULL;
-    node->append = -2;
     node->next = NULL;
 
 }
@@ -67,7 +66,6 @@ void parse_line(t_sh_data **sh, t_parsed_data **header, char **split_space, char
         free(node);
         parsing_cleanup(sh, pipe_segments, split_space);
     }
-    printf("in parse_line\n");
     if (parse_cmd_and_path(*sh, node, split_space, cpy_segment) == 0)
         printf("to be done\n");
     parse_add_node(header, node); //add nodes to the bottom of the list

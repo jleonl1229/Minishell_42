@@ -131,9 +131,9 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
     if (ft_strncmp(redir, "<", ft_strlen(redir)) == 0)
         return redir_fd(parsed_data, &(parsed_data->simple_in_redir), file, "<");
     else if (ft_strncmp(redir, ">", ft_strlen(redir)) == 0)
-        return redir_fd(parsed_data, &(parsed_data->simple_out_redir), file, ">");
+        return redir_fd(parsed_data, &(parsed_data->last_fd), file, ">");
     else if (ft_strncmp(redir, ">>", ft_strlen(redir)) == 0)
-        return redir_fd(parsed_data, &(parsed_data->append), file, ">>");
+        return redir_fd(parsed_data, &(parsed_data->last_fd), file, ">>");
     else if (ft_strncmp(redir, "<<", ft_strlen(redir)) == 0)
     {
         node = malloc(sizeof(t_list));
@@ -156,6 +156,7 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
     int i;
     int sentinel;
     char **cpy_segment;
+    int new_fd;
     
     i = 0;
     cpy_segment = alloc_cpy_segment(split_space);
@@ -167,6 +168,13 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
         free(parsed_data->here_doc);
         free_matrix(cpy_segment);
         return NULL;
+    }
+    if (parsed_data->here_doc != NULL)
+    {
+        new_fd = heredoc_to_infile(parsed_data->here_doc);
+        if (parsed_data->simple_in_redir != -1)
+            parsed_data->simple_in_redir = new_fd;
+        //free_list(parsed_data->here_doc)
     }
      return cpy_segment;
 }
@@ -211,7 +219,7 @@ int fill_cmd_and_args(int i, int j, t_parsed_data *node, char **cmd)
 {
     while (cmd[i] != NULL)
         remove_quotes(cmd[i++]);
-    node->cmd = malloc(i * sizeof(char*) + 1);
+    node->cmd = malloc((i +1)* sizeof(char*));
     if (node->cmd == NULL) 
         return 0;
     i = 0;
@@ -234,7 +242,7 @@ char *path_is_exec(t_parsed_data *node, char **env_value )
 	char	*path_cmd;
 	char	*end;
 
-	end = ft_strjoin("/", node->cmd);
+	end = ft_strjoin("/", node->cmd[0]);
 	if (end == NULL)
 		return (NULL);
 	while (*env_value++ != NULL)
@@ -288,9 +296,9 @@ int fill_path(t_sh_data *sh, t_parsed_data *node)
     i = 0;
     while(builtin[i] != NULL)
     {
-        if (ft_strncmp(node->cmd, builtin[i], ft_strlen(node->cmd)) == 0)
+        if (ft_strncmp(node->cmd[0], builtin[i], ft_strlen(node->cmd[0])) == 0)
         {
-            node->path = node->cmd;
+            node->path = node->cmd[0];
             return 1;
         }
         i++;

@@ -64,6 +64,11 @@ void shell_loop(t_sh_data **sh)
     while (1)
     {
         //signals (need to be reset every time? could it go before while loop?)
+        if (isatty(0)) {
+        printf("STDIN is a terminal\n");
+        } else {
+        printf("STDIN is not a terminal\n");
+        }
         e_pipe = get_input(*sh, line, e_pipe);
         checker = input_validation((*sh)->prev_line, sh);
         if (checker == 0)
@@ -74,8 +79,37 @@ void shell_loop(t_sh_data **sh)
             continue;
         }
         (*sh)->parsed_header = parsing(*sh); //(*sh)->prev_line as parameter can be ommited
+        /*for (int fd = 0; fd <100; fd++) {
+        if (fcntl(fd, F_GETFD) != -1) {
+        printf("File descriptor %d is open\n", fd);
+        }
+        }*/
         piping(*sh);
-        int i;
+        //printf("piping has been executed\n");
+        //frees before starting loop again
+        free(line);
+        free((*sh)->new_line);
+        (*sh)->new_line = NULL;
+        free_parsing_list(sh);
+        if (ft_strncmp((*sh)->prev_line, "exit", ft_strlen("exit")) == 0)
+        {
+            write(1, "exit\n", ft_strlen("exit\n"));
+            break;
+        }
+        write(1, (*sh)->prev_line, ft_strlen((*sh)->prev_line));
+        write(1, "\n",1);
+    }
+    //frees when exiting program successfully
+    free_env_list((*sh)->env_header);
+   free((*sh)->prev_line);
+    free(*sh);
+
+    
+    
+}
+
+//THIS CODE GOES BETWEEN piping() and "frees before starting loop again"
+/*int i;
         while((*sh)->parsed_header != NULL)
         {
             printf("sh->parsed_header->path is: %s\n", (*sh)->parsed_header->path);
@@ -102,25 +136,4 @@ void shell_loop(t_sh_data **sh)
             printf("sh->parsed_header->next is: %p\n", (void *)(*sh)->parsed_header->next);           
             (*sh)->parsed_header = (*sh)->parsed_header->next;
              printf("sh->parsed_header is %p\n", (*sh)->parsed_header);
-        }
-        //frees before starting loop again
-        free(line);
-        free((*sh)->new_line);
-        (*sh)->new_line = NULL;
-        free_parsing_list(sh);
-        if (ft_strncmp((*sh)->prev_line, "exit", ft_strlen("exit")) == 0)
-        {
-            write(1, "exit\n", ft_strlen("exit\n"));
-            break;
-        }
-        write(1, (*sh)->prev_line, ft_strlen((*sh)->prev_line));
-        write(1, "\n",1);
-    }
-    //frees when exiting program successfully
-    free_env_list((*sh)->env_header);
-   free((*sh)->prev_line);
-    free(*sh);
-
-    
-    
-}
+        }*/

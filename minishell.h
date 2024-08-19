@@ -27,10 +27,8 @@ typedef struct s_parsed_data
     char *path; //absolute path to executable
     char **cmd; //executable command + its args
     int     simple_in_redir; //fd where stdin is redirected from
-    int     simple_out_redir; //fd where stdout is redirected to
     t_list *here_doc; //delimiter to handle here_doc feature
-    int     append; //filename to handle append redirection to stdout
-    int     last_fd: //last assigned ouput fd, to resolve cases like: "echo "hello" >out >>out1"
+    int     last_fd; //last assigned ouput fd, to resolve cases like: "echo "hello" >out >>out1"
     struct s_parsed_data *next;
 } t_parsed_data;
 
@@ -46,7 +44,7 @@ typedef struct s_sh_data
 }   t_sh_data;
 
 //execution/execution.c
-void child_process(t_sh_data *sh, t_parsed_data *header);
+void	child_process(t_sh_data *sh, t_parsed_data *header, int fd[2]);
 void piping(t_sh_data *sh);
 
 //parsing/parsing.c
@@ -93,6 +91,11 @@ void	env_add_node(t_env **header, t_env *new_node);
 int env_quotes(char c, int *single_q, int *double_q, int *j);
 char *find_env_pair(t_env *head, char *var_name);
 
+//utils/env_utils2.c
+char *env_concat(t_env *env, char **envp);
+char **alloc_char_env(t_env *header);
+char **tenv_to_char(t_env *header);
+
 //utils/input_utils.c
 int	bad_initial_char(char *line, t_sh_data **sh);
 int	bad_final_char(char *line, t_sh_data **sh);
@@ -124,7 +127,7 @@ void add_space(t_sh_data *sh);
 void parse_add_node(t_parsed_data **head, t_parsed_data *new_node);
 char **alloc_cpy_segment(char **segment);
 int mod_cpy_segment(char **cpy_segment, int i, t_parsed_data *parsed_data, char **segment);
-int redir_fd(int *redir, char *file, char *redir_type);
+int redir_fd(t_parsed_data *parsed_data, int *redir, char *file, char *redir_type);
 int handle_redir(char *redir, char *file, t_parsed_data *parsed_data);
 char **parse_redir(t_parsed_data *parsed_data, char **split_space);
 char **cmd_arr(char **cpy_segment);
@@ -133,3 +136,7 @@ char *path_is_exec(t_parsed_data *node, char **env_value );
 char    **extract_path(t_sh_data *sh);
 int fill_path(t_sh_data *sh, t_parsed_data *node);
 int parse_cmd_and_path(t_sh_data *sh, t_parsed_data *node, char **segment, char **cpy_segment);
+
+//utils/parsing_utils4.c
+int heredoc_to_infile(t_list *hdoc);
+
