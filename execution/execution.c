@@ -154,9 +154,11 @@ void	piping(t_sh_data *sh)
             close(header->simple_in_redir);
         if (header->last_fd != -2)
             close(header->last_fd);
-        //if access(karaket good):
-        if (unlink("karaket.txt") == -1) //removing here_doc temporary file
-			perror("unlink() here_doc");
+        if (access("karaket.txt", F_OK) == 0)
+        {
+            if (unlink("karaket.txt") == -1) //removing here_doc temporary file
+			    perror("unlink() here_doc");
+        }
 		header = header->next;
 	}
     dup2(original_stdin, STDIN_FILENO);

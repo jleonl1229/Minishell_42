@@ -26,7 +26,7 @@ typedef struct s_parsed_data
 {
     char *path; //absolute path to executable
     char **cmd; //executable command + its args
-    int     simple_in_redir; //fd where stdin is redirected from
+    int     simple_in_redir; //fd where stdin is redirected from. PROBABLY NEED TO MDIFY NAME TO HANDLE HERE_DOC INPUT TOO
     t_list *here_doc; //delimiter to handle here_doc feature
     int     last_fd; //last assigned ouput fd, to resolve cases like: "echo "hello" >out >>out1"
     struct s_parsed_data *next;
@@ -132,6 +132,7 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data);
 char **parse_redir(t_parsed_data *parsed_data, char **split_space);
 char **cmd_arr(char **cpy_segment);
 int fill_cmd_and_args(int i, int j, t_parsed_data *node, char **cmd);
+int is_absolute_path(t_parsed_data *node);
 char *path_is_exec(t_parsed_data *node, char **env_value );
 char    **extract_path(t_sh_data *sh);
 int fill_path(t_sh_data *sh, t_parsed_data *node);

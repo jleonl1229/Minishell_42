@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 11:44:20 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/08/09 12:36:55 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/08/19 12:48:05 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ int redir_fd(t_parsed_data *parsed_data, int *redir, char *file, char *redir_typ
     fd = 0;
     if (*redir == -1)
         return 1;
-    if (*redir != -2)
+    if (*redir != -2 && *redir != 988)
     {
         fd = close(*redir);
         if (fd == -1)
@@ -105,7 +105,7 @@ int redir_fd(t_parsed_data *parsed_data, int *redir, char *file, char *redir_typ
         *redir = open(file, O_RDONLY);
     else if(ft_strncmp(redir_type, ">", ft_strlen(redir_type)) == 0)
     {
-        *redir = open(file, O_CREAT | O_RDWR, 0777);
+        *redir = open(file, O_CREAT | O_RDWR | O_TRUNC, 0777);
         parsed_data->last_fd = *redir;
     }
     else if (ft_strncmp(redir_type, ">>", ft_strlen(redir_type)) == 0)
@@ -142,6 +142,12 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
         node->content = ft_strdup(file);
         node->next = NULL;
         ft_lstadd_back(&(parsed_data->here_doc), node);
+        if (parsed_data->simple_in_redir != -1)
+        {
+            if (parsed_data->simple_in_redir != -2)
+                close(parsed_data->simple_in_redir);
+            parsed_data->simple_in_redir = 988;
+        }
     }
     return 1;
 }
@@ -172,8 +178,10 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
     if (parsed_data->here_doc != NULL)
     {
         new_fd = heredoc_to_infile(parsed_data->here_doc);
-        if (parsed_data->simple_in_redir != -1)
+        if (parsed_data->simple_in_redir != -1 && parsed_data->simple_in_redir == 988)
             parsed_data->simple_in_redir = new_fd;
+        else
+            close(new_fd);
         //free_list(parsed_data->here_doc)
     }
      return cpy_segment;
@@ -237,12 +245,30 @@ int fill_cmd_and_args(int i, int j, t_parsed_data *node, char **cmd)
     return 1;
 }
 
+int is_absolute_path(t_parsed_data *node)
+{
+    if (node->cmd[0][0] == '/')
+    {
+        if (access(node->cmd[0], X_OK) == 0)
+        {
+            node->path = node->cmd[0];
+            return 1;
+        }
+        else
+            return 0;
+    }
+    return 0;
+
+}
+
 char *path_is_exec(t_parsed_data *node, char **env_value )
 {
 	char	*path_cmd;
 	char	*end;
 
-	end = ft_strjoin("/", node->cmd[0]);
+    if (is_absolute_path(node) == 1||ft_strlen(node->cmd[0]) == 0)
+        return (NULL);
+    end = ft_strjoin("/", node->cmd[0]);
 	if (end == NULL)
 		return (NULL);
 	while (*env_value++ != NULL)
@@ -296,7 +322,8 @@ int fill_path(t_sh_data *sh, t_parsed_data *node)
     i = 0;
     while(builtin[i] != NULL)
     {
-        if (ft_strncmp(node->cmd[0], builtin[i], ft_strlen(node->cmd[0])) == 0)
+        if (ft_strncmp(node->cmd[0], builtin[i], ft_strlen(node->cmd[0])) == 0 
+        && ft_strlen(node->cmd[0]) == ft_strlen(builtin[i]))
         {
             node->path = node->cmd[0];
             return 1;
@@ -308,7 +335,10 @@ int fill_path(t_sh_data *sh, t_parsed_data *node)
         return 0;
     path = path_is_exec(node, env_path);
     free_matrix(env_path);
-    if (path == NULL) //path can be null because malloc failure or because NO_CMD_PATH
+    printf("node->path is: %s\n", node->path);
+    if(node->path != NULL) //meaning that path is absolute
+        return 1;
+    if (path == NULL) //path can be null because malloc failure, because PATH is absolute, or because NO_CMD_PATH
         return 0;
     node->path = path;
     return 1;

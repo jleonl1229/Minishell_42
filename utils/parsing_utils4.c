@@ -5,7 +5,7 @@ int heredoc_to_infile(t_list *hdoc)
     int new_fd;
     char *line;
 
-    while (hdoc->next != NULL) //i.e. why you're not on the last node
+    while (hdoc->next != NULL) //i.e. while you're not on the last node
     {
         while (1)
         {
@@ -42,6 +42,7 @@ int heredoc_to_infile(t_list *hdoc)
     }
     close(new_fd);
 	new_fd = open("karaket.txt", O_RDONLY);
+    printf("karaket.txt fd is: %d\n", new_fd);
 	if (new_fd == -1)
 		perror("new_file");
 	return (new_fd);
