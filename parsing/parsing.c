@@ -54,21 +54,36 @@ void parsed_node_init(t_parsed_data *node)
 void parse_line(t_sh_data **sh, t_parsed_data **header, char **split_space, char **pipe_segments) 
 {
     t_parsed_data *node;
-	char **cpy_segment;
+	result res;
 
     node = (t_parsed_data *)malloc(sizeof(t_parsed_data)); // to be freed with list
 	if (node == NULL)
 		parsing_cleanup(sh, pipe_segments, split_space);
     parsed_node_init(node);
-    cpy_segment = parse_redir(node, split_space);
-    if (cpy_segment == NULL)
+    res = parse_redir(node, split_space);
+    if (res.error_code == 2)
     {
         free(node);
+        printf("parse_redir\n");
         parsing_cleanup(sh, pipe_segments, split_space);
     }
-    if (parse_cmd_and_path(*sh, node, split_space, cpy_segment) == 0)
-        printf("to be done\n");
-    parse_add_node(header, node); //add nodes to the bottom of the list
+    else if (res.error_code == 1) //SIGINT caught
+    {
+        //printf("parse_line(): sigint caught\n");
+        free(node);
+        free((*sh)->new_line);
+        free_matrix(pipe_segments);
+        free_matrix(split_space);
+        // free((*sh)->prev_line);?
+        return;
+    }
+    if (parse_cmd_and_path(*sh, node, split_space, res.str_arr) == -1)
+    {
+        free(node);
+        printf("parse_cmd_and_path\n");
+        parsing_cleanup(sh, pipe_segments, split_space);
+    }
+    parse_add_node(header, node); //add nodes to the bottom of the list*/
 }
 
 t_parsed_data *parsing(t_sh_data *sh)
@@ -91,8 +106,15 @@ t_parsed_data *parsing(t_sh_data *sh)
             parsing_cleanup(&sh, pipe_segments, 0);
         split_space = env_parse (0, 0, split_space, sh->env_header);
         if (split_space == NULL)
-            printf("split_space after env_parse is null\n");
+            parsing_cleanup(&sh, pipe_segments, split_space);
 		parse_line(&sh, &head, split_space, pipe_segments);
+        //printf("signal_received is: %d\n", signal_received);
+        if (signal_received == 1)
+        {
+            //printf("parsing(): sigint caught\n");
+            signal_received = 0;
+            return NULL;
+        }
         free_matrix(split_space); 
 	}
     free_matrix(pipe_segments);

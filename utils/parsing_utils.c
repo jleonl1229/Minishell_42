@@ -136,4 +136,5 @@
  	}
  	pointer[i] = NULL;
  	return (pointer);
- }
+}
+

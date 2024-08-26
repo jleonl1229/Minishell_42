@@ -77,6 +77,7 @@
  from "<cat<<cat|cat" to " < cat << cat | cat". Adds spaces around
  special chars.
  new_line is saved in the t_sh_data struct
+ I forgot why is this useful
  */
  void add_space(t_sh_data *sh)
  {

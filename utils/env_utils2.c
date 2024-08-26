@@ -1,4 +1,6 @@
-#include "../minishell.h"
+/*#include "../minishell.h"
+
+OVER COMPLICATED MYSELF, KEEPING THESE JUST IN CASE
 
 char *env_concat(t_env *env, char **envp) 
 {
@@ -69,3 +71,4 @@ char **tenv_to_char(t_env *header)
     env_arr[i] = NULL;
     return env_arr;
 }
+*/

@@ -7,7 +7,21 @@
 #include "./minishell_libft/libft.h"
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <signal.h>
 
+extern int signal_received; //global var for signals
+
+//struct created to differentiate the return value of cmd_arr() function in parsing
+/*
+** error code reference for parse_redir():
+**      0: no error, 1: SIGINT caught, 0, 2: malloc failure (terminate program)
+** error code reference for cmd_arr():
+**      0: no error, 1: count is 0, 2: malloc, close or open failure (terminate program)
+*/
+typedef struct s_result {
+    char **str_arr;
+    int error_code;
+} result;
 
 /*struct of a node in a linked list. Each node's data made of env var name + content 
 Essentially a copy of char **env, likely done to easily manipulate env vars by our program
@@ -63,10 +77,20 @@ t_env *dup_env(char **envp, t_env *header, t_sh_data **sh);
 void shell_init(t_sh_data **sh, char **envp);
 
 //shell_loop/shell_loop.c
+int ignore_history(char *line);
 int append_line(t_sh_data *sh, char *line);
 int save_to_history(t_sh_data *sh, char *line, int e_pipe);
 int get_input(t_sh_data *sh, char *line, int e_pipe);
 void shell_loop(t_sh_data **sh);
+
+//signals/signals.c
+void handle_sigint(int sig);
+void	def_signals(void);
+void	sig_blocking_handler(int sig);
+void	blocking_cmd_sig(void);
+void heredoc_sigint(int sig);
+void e_pipe_sig_handler(int sig);
+void ending_pipe_sig(void);
 
 //shell_loop/input_validation.c
 char three_invalid_print(char *line, char *last_invalid);
@@ -81,7 +105,7 @@ void	argc_checker(int argc, t_sh_data **sh);
 char	**free_matrix(char **pointer);
 void free_tlist(t_list *header);
 void free_env_list(t_env *head);
-void pre_parse_cleanup(t_sh_data **sh, t_env **header, char ***org);
+void pre_parse_cleanup(t_sh_data **sh, t_env *header, char **org);
 void    free_parsing_list(t_sh_data **sh);
 void parsing_cleanup(t_sh_data **sh, char **pipe_segments, char **split_space);
 
@@ -91,10 +115,10 @@ void	env_add_node(t_env **header, t_env *new_node);
 int env_quotes(char c, int *single_q, int *double_q, int *j);
 char *find_env_pair(t_env *head, char *var_name);
 
-//utils/env_utils2.c
-char *env_concat(t_env *env, char **envp);
-char **alloc_char_env(t_env *header);
-char **tenv_to_char(t_env *header);
+//utils/env_utils2.c || OVERCOMPLICATED MYSELF, KEEPING THESE IN JUST IN CASE
+//char *env_concat(t_env *env, char **envp);
+//char **alloc_char_env(t_env *header);
+//char **tenv_to_char(t_env *header);
 
 //utils/input_utils.c
 int	bad_initial_char(char *line, t_sh_data **sh);
@@ -129,9 +153,9 @@ char **alloc_cpy_segment(char **segment);
 int mod_cpy_segment(char **cpy_segment, int i, t_parsed_data *parsed_data, char **segment);
 int redir_fd(t_parsed_data *parsed_data, int *redir, char *file, char *redir_type);
 int handle_redir(char *redir, char *file, t_parsed_data *parsed_data);
-char **parse_redir(t_parsed_data *parsed_data, char **split_space);
-char **cmd_arr(char **cpy_segment);
-int fill_cmd_and_args(int i, int j, t_parsed_data *node, char **cmd);
+result parse_redir(t_parsed_data *parsed_data, char **split_space);
+result cmd_arr(char **cpy_segment, int i, int count);
+int fill_cmd_and_args(int i, t_parsed_data *node, char **cmd) ;
 int is_absolute_path(t_parsed_data *node);
 char *path_is_exec(t_parsed_data *node, char **env_value );
 char    **extract_path(t_sh_data *sh);

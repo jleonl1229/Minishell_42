@@ -12,20 +12,22 @@ t_env *dup_env(char **envp, t_env *header, t_sh_data **sh)
     char **org;
     t_env *new_node;
 
+    int i = 0;
     while (*envp != NULL)
     {
         a_env = ft_split(*envp, '=');
         org = a_env;
         if (a_env == NULL || *a_env == NULL)
-            pre_parse_cleanup(sh, &header, &org);
+            pre_parse_cleanup(sh, header, org);
         var_name = *a_env;
         var_content = *(++a_env);
         new_node = env_create_node(var_name, var_content);
         if (new_node == NULL)
-            pre_parse_cleanup(sh, &header, &org);
+            pre_parse_cleanup(sh, header, org);
         env_add_node(&header, new_node);
         free_matrix(org);
         envp++;
+        i++;
     }
     return header;
 }
@@ -46,10 +48,11 @@ void shell_init(t_sh_data **sh, char **envp)
 		exit(EXIT_SUCCESS);
     }
     (*sh)->env_header = NULL;
-    (*sh)->prev_line = NULL; //only null whe initialized
+    (*sh)->prev_line = NULL; //only null when initialized
     (*sh)->parsed_header = NULL;
     (*sh)->new_line = NULL;
     (*sh)->env_header = dup_env(envp, header, sh); //copies envp in sh->env_header
-    (*sh)->env = tenv_to_char((*sh)->env_header);
+    (*sh)->env = envp;
+    //(*sh)->env = tenv_to_char((*sh)->env_header); // stupid me did not contemplate the possibility above
 
 }

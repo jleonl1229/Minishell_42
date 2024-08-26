@@ -63,10 +63,8 @@ void    free_parsing_list(t_sh_data **sh)
     while(current != NULL)
     {
         next_node = current->next;
-        //if (current->cmd != NULL)
-        free(current->cmd);
-        //if (current->args != NULL) //modified free_matrix by adding pointer == null condition checker
-        free_tlist(current->here_doc);
+        free_matrix(current->cmd);
+        free(current->path);
         free(current);
         current = next_node;
     }
@@ -76,18 +74,18 @@ void    free_parsing_list(t_sh_data **sh)
 **  function called when dup_env(), bad_initial_char() or bad_final_char() error
 **
 */
-void pre_parse_cleanup(t_sh_data **sh, t_env **header, char ***org)
+void pre_parse_cleanup(t_sh_data **sh, t_env *header, char **org)
 {
     if (org != NULL)
-        free_matrix(*org);
+        free_matrix(org);
     if ((*sh)->env_header != NULL)
         free_env_list((*sh)->env_header);
     else
-        free_env_list(*header);
+        free_env_list(header);
     if((*sh)->prev_line != NULL)
         free((*sh)->prev_line);
     free(*sh);
-    printf("malloc error\n");
+    //printf("malloc error\n");
     exit(1);
 }
 

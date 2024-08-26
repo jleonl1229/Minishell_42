@@ -1,7 +1,9 @@
 #include "../minishell.h"
 
-
-
+/*
+** first I used strncpy, then had to change to ft_strlcpy, but as both functions aren't exactly
+** the same, I'm keeping it for the moment.
+*/
 char	*expanded_var (char **env_pair, char *input, int *start)
 {
 	int exp_len;
@@ -12,24 +14,32 @@ char	*expanded_var (char **env_pair, char *input, int *start)
 	if (env_pair == NULL || *env_pair == NULL)
 		return NULL;
 	(*start)++;
-	vname_len = strlen(env_pair[0]) + 1; // + 1 to include '$'
+	vname_len = ft_strlen(env_pair[0]) + 1; // + 1 to include '$'
 	if (vname_len == 1 && ft_strlen(input) != 1 && ft_strncmp(input, "$", ft_strlen("$")) == 0)
-		return strdup(input +1);
+		return ft_strdup(input +1);
 	else if (vname_len ==1)
-		return strdup(input);
-	exp_len = strlen(env_pair[1]);
-	new_len = strlen(input) - vname_len + exp_len;
+		return ft_strdup(input);
+	exp_len = ft_strlen(env_pair[1]);
+	new_len = ft_strlen(input) - vname_len + exp_len;
 	exp_str = (char *)malloc(new_len + 1);
 	if (exp_str == NULL)
 		return NULL;
-	strncpy(exp_str, input, (*start) -1);
-	strncpy(exp_str + (*start -1), env_pair[1], exp_len);
-	strncpy(exp_str + (exp_len + *start -1), input + (*start-1) + vname_len, 
-					strlen(input) - (*start -1) - vname_len + 1); // +1 for null char
+	//strncpy(exp_str, input, (*start) -1);
+	ft_strlcpy(exp_str, input, *start);
+	//strncpy(exp_str + (*start -1), env_pair[1], exp_len);
+	ft_strlcpy(exp_str + (*start -1), env_pair[1], exp_len +1);
+	//strncpy(exp_str + (exp_len + *start -1), input + (*start-1) + vname_len, 
+					//strlen(input) - (*start -1) - vname_len + 1); // +1 for null char
+	ft_strlcpy(exp_str + (exp_len + *start -1), input + (*start -1) + vname_len,
+					ft_strlen(input) - (*start -1) - vname_len +1);
 	*start = *start - 1;
 	return exp_str;
 }
 
+
+/*
+**	var_name is freed on find_env_pair for function max lines purposes
+*/
 char **get_var_content(char *input, int start, t_env *head)
 {
 	int var_len;
@@ -43,16 +53,22 @@ char **get_var_content(char *input, int start, t_env *head)
 	var_name = malloc (var_len - start + 1);
 	if (var_name == NULL)
 		return NULL;
-	strncpy(var_name, &input[start], var_len - start); //ft_strlcpy
-	var_name[var_len - start] = '\0';
+	ft_strlcpy(var_name, &input[start], var_len - start + 1);
 	result = (char **)malloc(sizeof(char*)*3);
     if (result == NULL)
     {
         free(var_name);
         return NULL;
     }
-    result[0] = strdup(var_name); //unprotected
+    result[0] = ft_strdup(var_name);
+	if (result[0] == NULL)
+	{
+		free(var_name);
+		return free_matrix(result);
+	}
     var_content = find_env_pair(head, var_name) ;
+	if (var_content == NULL)
+		return free_matrix(result);
     result[1] = var_content;
     result[2] = NULL;
 	return result;
@@ -67,6 +83,8 @@ char *act_on_dollar(char *input, int *j, t_env *env_list)
     old_input = input;
     i = (*j) +1;
 	env_pair = get_var_content(input, i, env_list);
+	if (env_pair == NULL)
+		return NULL;		
 	input = expanded_var(env_pair, input, j);
 	if (input == NULL)
 	{
@@ -104,3 +122,4 @@ char  **env_parse (int single_q, int double_q, char **input, t_env *env_list )
 	}
 	return input;
 }
+

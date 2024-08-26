@@ -99,7 +99,7 @@ int redir_fd(t_parsed_data *parsed_data, int *redir, char *file, char *redir_typ
     {
         fd = close(*redir);
         if (fd == -1)
-            return (printf("redir_fd: error closing\n"));
+            return (printf("redir_fd(): close() function error\n"));
     }
     if (ft_strncmp(redir_type, "<", ft_strlen(redir_type)) == 0)
         *redir = open(file, O_RDONLY);
@@ -137,9 +137,8 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
     else if (ft_strncmp(redir, "<<", ft_strlen(redir)) == 0)
     {
         node = malloc(sizeof(t_list));
-        if (node == NULL)
-            return -1;
-        node->content = ft_strdup(file);
+        if (node == NULL || (node->content = ft_strdup(file)) == NULL)
+            return printf("handle_redir(): malloc failure");
         node->next = NULL;
         ft_lstadd_back(&(parsed_data->here_doc), node);
         if (parsed_data->simple_in_redir != -1)
@@ -157,51 +156,69 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
  **  and fills a copy of char **segment with modified data to ignore
  **  already parsed data
  */
- char **parse_redir(t_parsed_data *parsed_data, char **split_space)
+ result parse_redir(t_parsed_data *parsed_data, char **split_space)
 {
     int i;
     int sentinel;
-    char **cpy_segment;
+    result res;
     int new_fd;
     
     i = 0;
-    cpy_segment = alloc_cpy_segment(split_space);
-    if (cpy_segment == NULL)
-        return NULL;
-    sentinel =  mod_cpy_segment(cpy_segment, i, parsed_data, split_space);
+    res.str_arr = alloc_cpy_segment(split_space);
+    if (res.str_arr == NULL)
+    {
+        res.error_code = 2;
+        return res;
+    }
+    sentinel =  mod_cpy_segment(res.str_arr, i, parsed_data, split_space);
     if (sentinel == -1)
     {
-        free(parsed_data->here_doc);
-        free_matrix(cpy_segment);
-        return NULL;
+        free_tlist(parsed_data->here_doc);
+        free_matrix(res.str_arr);
+        res.str_arr = NULL;
+        res.error_code = 2;
+        return res;
     }
     if (parsed_data->here_doc != NULL)
     {
         new_fd = heredoc_to_infile(parsed_data->here_doc);
+        if (new_fd == -1)
+        {
+            free_tlist(parsed_data->here_doc);
+            free_matrix(res.str_arr);
+            res.str_arr = NULL;
+            res.error_code = 2;
+            return res;
+        }
+        else if (new_fd == -2) //SIGINT caught
+        {
+            free_tlist(parsed_data->here_doc);
+            free_matrix(res.str_arr);
+            res.str_arr = NULL;
+            res.error_code = 1;
+            return res;
+        }
         if (parsed_data->simple_in_redir != -1 && parsed_data->simple_in_redir == 988)
             parsed_data->simple_in_redir = new_fd;
         else
-            close(new_fd);
-        //free_list(parsed_data->here_doc)
+            close(new_fd); //unprotected
+        free_tlist(parsed_data->here_doc);
     }
-     return cpy_segment;
+    res.error_code = 0;
+     return res;
 }
-
 
 
  /*
  **  iterates over cpy_segment and returns a new array
- ** where elements with value "1" will be copied
- ** auxiliary to parse_cmd()
+ ** where elements with value "1" will be copied.
+ ** using a struct to differentiate return values of NULL between malloc error and count == 0
+ ** auxiliary to parse_cmd_and_path()
  */
- char **cmd_arr(char **cpy_segment)
+ result cmd_arr(char **cpy_segment, int i, int count)
  {
-	int i;
-	int count;
-	char **cmd;
-	
-	i = 0;
-	count = 0;
+    result res;
+
 	while (cpy_segment[i] != NULL)
 	{
 		if (ft_strncmp(cpy_segment[i], "1", ft_strlen(cpy_segment[i])) == 0)
@@ -211,19 +228,30 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
     if (count == 0)
     {
         free_matrix(cpy_segment);
-        return NULL;
+        res.error_code = 1;
+        res.str_arr = NULL;
+        return res;
     }
-    cmd = malloc((count + 1) * sizeof(char *));
-	if (cmd == NULL)
+    res.str_arr = malloc((count + 1) * sizeof(char *)); 
+	if (res.str_arr == NULL)
     {
         free_matrix(cpy_segment);
-        return NULL;
+        res.error_code = 2;
+        return res; 
     }
-	cmd[count] = NULL;
-    return cmd;
+	res.str_arr[count] = NULL;
+    res.error_code = 0;
+    return res;
  }
 
-int fill_cmd_and_args(int i, int j, t_parsed_data *node, char **cmd) 
+
+/*
+**  At this point and if split_spaces has been ["echo", "hello", ">", "out", NULL]
+**  char **cmd will be ["echo", "hello", NULL]
+**  for each element quotes are removed and the the cmd element from the parsed node struct
+** is filled (cmd[0] will be the command and cmd++ will be the args)
+*/
+int fill_cmd_and_args(int i, t_parsed_data *node, char **cmd) 
 {
     while (cmd[i] != NULL)
         remove_quotes(cmd[i++]);
@@ -233,15 +261,15 @@ int fill_cmd_and_args(int i, int j, t_parsed_data *node, char **cmd)
     i = 0;
     while (cmd[i] != NULL)
     {
-        node->cmd[j] = ft_strdup(cmd[i++]);
-        if (node->cmd[j] == NULL)
+        node->cmd[i] = ft_strdup(cmd[i]);
+        if (node->cmd[i] == NULL)
          {
             free_matrix(node->cmd);
             return 0;
         }
-        j++;
+        i++;
     }
-    node->cmd[j] = NULL;
+    node->cmd[i] = NULL;
     return 1;
 }
 
@@ -251,7 +279,7 @@ int is_absolute_path(t_parsed_data *node)
     {
         if (access(node->cmd[0], X_OK) == 0)
         {
-            node->path = node->cmd[0];
+            node->path = ft_strdup(node->cmd[0]);
             return 1;
         }
         else
@@ -261,6 +289,10 @@ int is_absolute_path(t_parsed_data *node)
 
 }
 
+/*
+**  if no path has been found for cmd, it returns NULL and program keeps going
+**  the execution part will be responsible for printing a no cmd path error
+*/
 char *path_is_exec(t_parsed_data *node, char **env_value )
 {
 	char	*path_cmd;
@@ -270,14 +302,14 @@ char *path_is_exec(t_parsed_data *node, char **env_value )
         return (NULL);
     end = ft_strjoin("/", node->cmd[0]);
 	if (end == NULL)
-		return (NULL);
-	while (*env_value++ != NULL)
+		return (char *) -1;
+	while (*env_value != NULL)
 	{
 		path_cmd = ft_strjoin(*env_value, end);
 		if (path_cmd == NULL)
 		{
 			free(end);
-			return (NULL);
+			return (char *) -1;
 		}
 		if (access(path_cmd, X_OK) == 0)
 		{
@@ -285,9 +317,9 @@ char *path_is_exec(t_parsed_data *node, char **env_value )
 			return (path_cmd);
 		}
 		free(path_cmd);
+        env_value++;
 	}
 	free(end);
-    //add printferror NO_CMD_PATH
 	return (NULL);
 }
 
@@ -308,10 +340,15 @@ char    **extract_path(t_sh_data *sh)
         current = current->next;
     }
     path = ft_split(to_split, ':');
+    if (path == NULL)
+        free_matrix(sh->parsed_header->cmd);
     return path;
 }
 
-
+/*
+**  fills absolute path to cmd executable. if the cmd is a builtin cmd it fills the path
+**  with the builtin name
+*/
 int fill_path(t_sh_data *sh, t_parsed_data *node)
 {
     const char *builtin[] = {"echo", "cd", "pwd", "export", "unset", "env", "exit", NULL};
@@ -325,7 +362,7 @@ int fill_path(t_sh_data *sh, t_parsed_data *node)
         if (ft_strncmp(node->cmd[0], builtin[i], ft_strlen(node->cmd[0])) == 0 
         && ft_strlen(node->cmd[0]) == ft_strlen(builtin[i]))
         {
-            node->path = node->cmd[0];
+            node->path = ft_strdup(node->cmd[0]); //unprotected
             return 1;
         }
         i++;
@@ -335,11 +372,13 @@ int fill_path(t_sh_data *sh, t_parsed_data *node)
         return 0;
     path = path_is_exec(node, env_path);
     free_matrix(env_path);
-    printf("node->path is: %s\n", node->path);
     if(node->path != NULL) //meaning that path is absolute
         return 1;
-    if (path == NULL) //path can be null because malloc failure, because PATH is absolute, or because NO_CMD_PATH
+    if (path == (char *) -1) //malloc failure
+    {
+        free_matrix(node->cmd);
         return 0;
+    }
     node->path = path;
     return 1;
 }
@@ -355,26 +394,29 @@ int fill_path(t_sh_data *sh, t_parsed_data *node)
  {
     int i;
     int j;
-    char **cmd;
+    result cmd;
     
     i = 0;
     j = 0;
-    cmd = cmd_arr(cpy_segment);
-    if (cmd == NULL)
+    cmd = cmd_arr(cpy_segment, 0, 0);
+    if (cmd.error_code == 1) //count == 0
         return 0;
+    else if (cmd.error_code == 2) //malloc error
+        return -1;
     while(segment[i] != NULL)
     {
         if (ft_strncmp(cpy_segment[i], "1", ft_strlen(cpy_segment[i])) == 0)
-            cmd[j++] = ft_strdup(segment[i]);
+            cmd.str_arr[j++] = ft_strdup(segment[i]);
         i++;
     }
-    if (fill_cmd_and_args(0, 0, node, cmd) == 0 || fill_path(sh, node) == 0)
+    free_matrix(cpy_segment);
+    if (fill_cmd_and_args(0, node, cmd.str_arr) == 0 || fill_path(sh, node) == 0)
     {
-        free_matrix(cmd);
-        return 0;
+        free_matrix(cmd.str_arr);
+        return -1;
     }
-	free_matrix(cpy_segment);
-	free_matrix(cmd);
+	//free_matrix(cpy_segment);
+	free_matrix(cmd.str_arr);
     return 1;
  }
 

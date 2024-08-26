@@ -24,26 +24,31 @@ int env_quotes(char c, int *single_q, int *double_q, int *j)
 
 
 /*
+**	returns the value of an environment variable if its name has been found
+**	returns an empty string if no var_name has been found or no value has been assigned.
+**	ft_strdup failure will be handled in the calling func
 **	auxiliary to env_parse()
 */
 char *find_env_pair(t_env *head, char *var_name) 
 {
-    t_env *current = head;
+    t_env *current;
+	
+	current = head;
     while (current != NULL) 
 	{
-        if (strncmp(current->env_name, var_name, strlen(var_name)) == 0 
-		&& strncmp(current->env_name, var_name, strlen(current->env_name)) == 0) //ft_strncmp
+        if (ft_strncmp(current->env_name, var_name, ft_strlen(var_name)) == 0 
+		&& ft_strlen(current->env_name) == ft_strlen(var_name))
         {
             free(var_name);
 			if (current->env_value != NULL)
-				return strdup(current->env_value);
+				return ft_strdup(current->env_value);
 			else
-				return strdup("\"\"");
+				return ft_strdup("\"\"");
         }
 		current = current->next;
     }
     free(var_name);
-    return strdup("\"\"");
+    return ft_strdup("\"\"");
 }
 
 t_env	*env_create_node(char *var_name, char *var_content)

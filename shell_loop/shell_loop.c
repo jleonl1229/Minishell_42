@@ -1,5 +1,25 @@
 #include "../minishell.h"
 
+int signal_received = 0; //global var definition
+
+int ignore_history(char *line)
+{
+    char *no_history;
+    int i;
+
+    no_history = " \t\n\v\f\r";
+    i = 0;
+    if (line[0] == '\0')
+        return 1;
+    while (no_history[i] != '\0')
+    {
+        if (no_history[i] == line[0])
+            return 1;
+        i++;
+    }
+    return 0;
+}
+
 
 int append_line(t_sh_data *sh, char *line)
 {
@@ -12,7 +32,8 @@ int append_line(t_sh_data *sh, char *line)
         pre_parse_cleanup(&sh, NULL, NULL);
     ft_strlcpy(new_line, sh->prev_line, len);
     ft_strlcat(new_line, line, len);
-    add_history(new_line);
+    if (ignore_history(line) == 0)
+        add_history(new_line);
     free(sh->prev_line);
     sh->prev_line = new_line;
 
@@ -24,35 +45,59 @@ int save_to_history(t_sh_data *sh, char *line, int e_pipe)
     if (line != NULL)
     {
         if (e_pipe == 1)
+        {
             append_line(sh, line);
+        }
         else
         {
             if (sh->prev_line == NULL || (ft_strncmp(line, sh->prev_line, ft_strlen(sh->prev_line)) != 0
             || ft_strncmp(line, sh->prev_line, ft_strlen(line)) != 0))
             {
-                add_history(line);
+               if (bad_final_char(line, &sh) != 7 && ignore_history(line) == 0)
+                    add_history(line);
                 free(sh->prev_line);
                 sh->prev_line = ft_strdup(line);
+                if (sh->prev_line == NULL)
+                    pre_parse_cleanup(&sh, NULL, NULL);
             }
         }
     }
     return 0;
 }
 
+/*
+**  e_pipe = 1 means that an ending pipe prompt has been introduced
+**  signal_received = 3 means that the SIGINT handler has been triggered for an ending pipe prompt
+** readline sends an EOF signal and returns NULL if CTRL +D is pressed.
+*/
 int get_input(t_sh_data *sh, char *line, int e_pipe)
 {
     char *str;
 
-    printf("epipe is: %d\n", e_pipe);
     if(e_pipe == 0)
         str = "$ "; 
     else
         str = "> ";
     line = readline(str);
+    if (line == NULL)
+    {
+        printf("exit\n");
+        pre_parse_cleanup(&sh, NULL, NULL);
+    }
+    if (e_pipe == 1 && signal_received == 3)
+    {
+        e_pipe = 0;
+        signal_received = 0;
+    }
+    printf("line is: %s\n", line);
     return (save_to_history(sh, line, e_pipe));
-
 }
 
+/*
+**  def_signals() inside loop to restart to the signal handler defined in def_signals.
+**  otherwise had problems with sig_blocking_cmd()
+** ""(*sh)->parsed_header == NULL"" will be true if SIGINT caught in heredoc
+*/
 void shell_loop(t_sh_data **sh)
 {
     char *line;
@@ -63,29 +108,35 @@ void shell_loop(t_sh_data **sh)
     e_pipe = 0;
     while (1)
     {
-        //signals (need to be reset every time? could it go before while loop?)
-        if (isatty(0)) {
+       /* if (isatty(0)) {
         printf("STDIN is a terminal\n");
         } else {
         printf("STDIN is not a terminal\n");
+        }*/
+        //printf("signal received is: %d\n", signal_received);
+        if (signal_received == 0) //default value, no signal triggered
+            def_signals();
+        else if (signal_received == 2) //ending pipe registered
+        {
+            signal_received = 0;
+            ending_pipe_sig();
         }
         e_pipe = get_input(*sh, line, e_pipe);
+        blocking_cmd_sig();
         checker = input_validation((*sh)->prev_line, sh);
         if (checker == 0)
             continue;
         else if (checker == 7)
         {
+            signal_received = 2;      
             e_pipe = 1;
             continue;
         }
-        (*sh)->parsed_header = parsing(*sh); //(*sh)->prev_line as parameter can be ommited
-        /*for (int fd = 0; fd <100; fd++) {
-        if (fcntl(fd, F_GETFD) != -1) {
-        printf("File descriptor %d is open\n", fd);
-        }
-        }*/
+        (*sh)->parsed_header = parsing(*sh);
+        //printf("sh->parsed_header = %s\n", (char *)(*sh)->parsed_header);
+        if ((*sh)->parsed_header == NULL) //SIGINT caught at the heredoc level
+            continue;
         piping(*sh);
-        //printf("piping has been executed\n");
         //frees before starting loop again
         free(line);
         free((*sh)->new_line);
@@ -96,13 +147,13 @@ void shell_loop(t_sh_data **sh)
             write(1, "exit\n", ft_strlen("exit\n"));
             break;
         }
-        write(1, (*sh)->prev_line, ft_strlen((*sh)->prev_line));
-        write(1, "\n",1);
+        //write(1, (*sh)->prev_line, ft_strlen((*sh)->prev_line));
+        //write(1, "\n",1);
     }
     //frees when exiting program successfully
     free_env_list((*sh)->env_header);
-   free((*sh)->prev_line);
-    free(*sh);
+    free((*sh)->prev_line);
+    free(*sh); //malloced in main
 
     
     

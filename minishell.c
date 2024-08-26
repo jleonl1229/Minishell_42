@@ -43,7 +43,7 @@ void	argc_checker(int argc, t_sh_data **sh)
     {
         free(*sh);
         *sh = NULL;
-        perror("Invalid argument count. Usage: ./minishell"); //to be replaced by fd_printf
+        printf("Invalid argument count. Usage: ./minishell"); //to be replaced by fd_printf
         exit(EXIT_SUCCESS);
     }
 

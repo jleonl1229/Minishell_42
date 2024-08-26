@@ -1,5 +1,8 @@
 #include "../minishell.h"
 
+/*
+**  auxiliary to three_valid
+*/
 char three_invalid_print(char *line, char *last_invalid) 
 {
     const char invalid_chars[] = "<>|";
@@ -36,7 +39,7 @@ int three_valid(char *line)
 	i = 0;
 	while (patterns[i] != NULL)
 	{
-		if (ft_strnstr(line, patterns[i], strlen(line)) != NULL)
+		if (ft_strnstr(line, patterns[i], ft_strlen(line)) != NULL)
 			return 0;
 		i++;
 	}

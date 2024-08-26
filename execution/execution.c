@@ -1,7 +1,7 @@
 #include "../minishell.h"
 
 
-void ft_prints(t_sh_data *sh)
+/*void ft_prints(t_sh_data *sh)
 {
     int i;
     t_parsed_data *ph = sh->parsed_header;
@@ -32,7 +32,7 @@ void ft_prints(t_sh_data *sh)
             ph = ph->next;
             printf("sh->parsed_header is: %p\n", sh->parsed_header);
         }
-}
+}*/
 
 /*
 edge cases:
@@ -104,7 +104,7 @@ void	piping(t_sh_data *sh)
 	t_parsed_data	*header;
     int original_stdin = dup(STDIN_FILENO);
 
-    ft_prints(sh);
+    //ft_prints(sh);
 	header = sh->parsed_header;
 	while (header != NULL)
 	{
@@ -165,7 +165,7 @@ void	piping(t_sh_data *sh)
     close(original_stdin);
     for (int fd = 0; fd <100; fd++) {
     if (fcntl(fd, F_GETFD) != -1) {
-    printf("File descriptor %d is open\n", fd);
+   // printf("File descriptor %d is open\n", fd);
     }
     }
 }

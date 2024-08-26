@@ -81,7 +81,12 @@ int	bad_final_char(char *line, t_sh_data **sh)
 	result = 0;
 	space_chars = " \t\n\v\f\r"; //space in the beginning, rest are 9,10,11,12,13 ASCII
 	trimmed = ft_strtrim((const char *)line, space_chars);
-	sz = ft_strlen(trimmed); //
+	sz = ft_strlen(trimmed);
+	if (ft_strlen(trimmed) == 0) // to prevent bugs from line == empty string
+	{
+		free(trimmed);
+		return result;
+	}
 	if (trimmed == NULL)
 		pre_parse_cleanup(sh, NULL, NULL);
 	if (trimmed[sz - 1] == '<' || trimmed[sz -1] == '>'/* || trimmed[sz-1] == '|'*/)
