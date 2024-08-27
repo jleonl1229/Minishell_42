@@ -48,8 +48,11 @@ char **get_var_content(char *input, int start, t_env *head)
 	char **result;
 
 	var_len = start;
-	while (input[var_len] != '\0' && (ft_isalnum(input[var_len]) ==1|| input[var_len] =='_'))
+	//printf("start is: %d\n", start);
+	while (input[var_len] != '\0' && (ft_isalnum(input[var_len]) ==1|| input[var_len] =='_' 
+	|| (start - var_len == 0 && input[var_len] == '?' )))
 		var_len++;
+	//printf("var_len is: %d\n", var_len);
 	var_name = malloc (var_len - start + 1);
 	if (var_name == NULL)
 		return NULL;
@@ -66,7 +69,11 @@ char **get_var_content(char *input, int start, t_env *head)
 		free(var_name);
 		return free_matrix(result);
 	}
-    var_content = find_env_pair(head, var_name) ;
+	//printf("var_name is: %s\n", var_name);
+	if (ft_strncmp(var_name, "?", ft_strlen(var_name)) == 0 && ft_strlen(var_name) == ft_strlen("?"))
+		var_content = ft_strdup("_LAST_EXIT_STATUS_");
+	else
+    	var_content = find_env_pair(head, var_name) ;
 	if (var_content == NULL)
 		return free_matrix(result);
     result[1] = var_content;
@@ -79,13 +86,23 @@ char *act_on_dollar(char *input, int *j, t_env *env_list)
     char *old_input;
     char **env_pair;
     int i;
+	//char *hardcode[] = {"$?", "_LAST_EXIT_STATUS_", NULL};
 
+	//printf("act_on_dollar(): input is: %s\n", input);
     old_input = input;
     i = (*j) +1;
 	env_pair = get_var_content(input, i, env_list);
+	int k = 0;
+	while(env_pair[k] != NULL)
+	{
+		//printf("env_pair[%d] is : %s\n", k, env_pair[k]);
+		k++;
+	}
+	//printf("input is: %s\n", input);
 	if (env_pair == NULL)
 		return NULL;		
 	input = expanded_var(env_pair, input, j);
+	printf("input after expanded_var is: %s\n", input);
 	if (input == NULL)
 	{
         free_matrix(env_pair);
@@ -95,7 +112,10 @@ char *act_on_dollar(char *input, int *j, t_env *env_list)
     free_matrix(env_pair);
     return input;
 }
-
+/*
+**	if command is "<infile cat | wc -l >out"
+**	char **input is: ["<", "infile", "cat"]
+*/
 char  **env_parse (int single_q, int double_q, char **input, t_env *env_list )
 {
 	int i;

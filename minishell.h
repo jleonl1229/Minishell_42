@@ -9,7 +9,15 @@
 #include <readline/history.h>
 #include <signal.h>
 
+/*
+** int value reference for global var:
+** 0: default value, default signals applied
+** 1: heredoc SIGINT catcher
+** 2: register ending pipe signal 
+** 3: ending pipe SIGINT catcher 
+*/
 extern int signal_received; //global var for signals
+
 
 //struct created to differentiate the return value of cmd_arr() function in parsing
 /*
@@ -55,11 +63,17 @@ typedef struct s_sh_data
     char    *prev_line; //last line saved to history
     char *new_line; //user inputed command with spaces around special chars
     t_parsed_data *parsed_header; //pointer to the head of the linked list holding the pipe segments data
+    char *last_exit_status; //holds the exit status of the last command (useful for $?)
 }   t_sh_data;
 
 //execution/execution.c
 void	child_process(t_sh_data *sh, t_parsed_data *header, int fd[2]);
 void piping(t_sh_data *sh);
+
+//execution/rstatus.c
+char *rs_alloc_new_str(char *input, int lex_len);
+char *rs_build_new_str(char *input, t_sh_data *sh, char *new_str, int lex_len);
+void cmd_return_status(t_sh_data *sh, char **input);
 
 //parsing/parsing.c
 char **split_by_pipe(char *line, int start, int segment_index, int i);

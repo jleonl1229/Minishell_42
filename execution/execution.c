@@ -34,6 +34,27 @@
         }
 }*/
 
+/*void cmd_return_status(t_sh_data *sh)
+{
+    int i;
+    char *str;
+
+    i = 0;
+    while (sh->parsed_header->cmd[i] != NULL)
+    {
+        //printf("in while loop\n");
+        if (ft_strncmp(sh->parsed_header->cmd[i], "$?", ft_strlen(sh->parsed_header->cmd[i])) == 0)
+        {
+            //printf("found a %s at %d\n", sh->parsed_header->cmd[i], i);
+            str = ft_itoa(sh->last_exit_status);
+            free(sh->parsed_header->cmd[i]);
+            sh->parsed_header->cmd[i] = ft_strdup(str);
+            free(str);
+        }
+        i++;
+    }
+}*/
+
 /*
 edge cases:
 1- command subpipe only includes invalid infile redir
@@ -78,6 +99,7 @@ void	child_process(t_sh_data *sh, t_parsed_data *header, int fd[2])
         }
 	}
 	close(fd[1]);
+    cmd_return_status(sh, sh->parsed_header->cmd);
     if (execve(header->path, header->cmd, sh->env) == -1)
         perror("execve");
 
@@ -102,6 +124,7 @@ void	piping(t_sh_data *sh)
 	int		fd[2];
 	pid_t	pid;
 	t_parsed_data	*header;
+    int status;
     int original_stdin = dup(STDIN_FILENO);
 
     //ft_prints(sh);
@@ -116,7 +139,10 @@ void	piping(t_sh_data *sh)
             if (header->simple_in_redir == -1)
                 printf("bash: infile: No such file or directory\n");
             else if (header->cmd != NULL)
+            {
+                cmd_return_status(sh, sh->parsed_header->cmd);
                 printf("bash: %s: command not found\n", header->cmd[0]);
+            }
             if (header->simple_in_redir > -1)
                 close(header->simple_in_redir);
             if (header->last_fd != -2)
@@ -125,6 +151,7 @@ void	piping(t_sh_data *sh)
 			    perror("dup2-2");
             close(fd[0]);
             close(fd[1]);
+            sh->last_exit_status = ft_strdup("127");
             header = header->next;
             continue;
         }
@@ -147,8 +174,10 @@ void	piping(t_sh_data *sh)
 		close(fd[1]);
 		if (dup2(fd[0], STDIN_FILENO) == -1)
 			perror("dup2-3");
-		if (wait(NULL) == -1)
+		if (wait(&status) == -1)
 			perror("wait()");
+        if (WIFEXITED(status))
+            sh->last_exit_status = ft_itoa(WEXITSTATUS(status));
 		close(fd[0]);
         if (header->simple_in_redir > -1)
             close(header->simple_in_redir);

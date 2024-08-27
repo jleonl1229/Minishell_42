@@ -53,6 +53,7 @@ void shell_init(t_sh_data **sh, char **envp)
     (*sh)->new_line = NULL;
     (*sh)->env_header = dup_env(envp, header, sh); //copies envp in sh->env_header
     (*sh)->env = envp;
+    (*sh)->last_exit_status = ft_strdup("0");
     //(*sh)->env = tenv_to_char((*sh)->env_header); // stupid me did not contemplate the possibility above
 
 }

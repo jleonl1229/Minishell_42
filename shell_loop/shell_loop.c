@@ -137,6 +137,7 @@ void shell_loop(t_sh_data **sh)
         if ((*sh)->parsed_header == NULL) //SIGINT caught at the heredoc level
             continue;
         piping(*sh);
+        printf("sh->last_exit_status is: %s\n", (char*)(*sh)->last_exit_status);
         //frees before starting loop again
         free(line);
         free((*sh)->new_line);
