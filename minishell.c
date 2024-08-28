@@ -8,13 +8,14 @@
     env can be non null, but no PATH be found
 
 */
-void env_checker(char **envp)
+void env_checker(char **envp, t_sh_data **sh)
 {
     int path_found;
 
     path_found = 0;
     if ( envp == NULL || *envp == NULL)
     {
+        free(*sh);
         perror("No ENV found, don't delete ENVs!");
         exit(EXIT_SUCCESS);
     }
@@ -29,17 +30,20 @@ void env_checker(char **envp)
     }
     if (path_found == 0)
     {
+        free(*sh);
         perror("No PATH found, don't delete the PATH env!");
         exit(EXIT_SUCCESS);
     }
 }
 
 // exits program if argc is not 1
-void	argc_checker(int argc)
+void	argc_checker(int argc, t_sh_data **sh)
 {
     if (argc != 1)
     {
-        perror("Invalid argument count. Usage: ./minishell");
+        free(*sh);
+        *sh = NULL;
+        printf("Invalid argument count. Usage: ./minishell"); //to be replaced by fd_printf
         exit(EXIT_SUCCESS);
     }
 
@@ -51,12 +55,9 @@ int main(int argc, char **argv, char **envp)
 
     sh = (t_sh_data *)malloc(sizeof(t_sh_data));
     printf("argv[0] is: %s\n", argv[0]); //to be replaced by (void)argv
-    argc_checker(argc);
-        //exit error if argc > 1
-    env_checker(envp);
-        //exit error if envp or *envp NULL
-    shell_init(sh, envp);
-    printf("entering shell loop...\n");
-    shell_loop(sh);
+    argc_checker(argc, &sh);
+    env_checker(envp, &sh);
+    shell_init(&sh, envp);
+    shell_loop(&sh);
     return 0;
 }

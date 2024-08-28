@@ -7,6 +7,9 @@ SHELL_INIT_DIR = shell_init/
 SHELL_LOOP_DIR = shell_loop/
 UTILS_DIR    = utils/
 PARSING_DIR = parsing/
+ERRORS_FREES = errors_frees/
+EXECUTION_DIR = execution/
+SIGNALS_DIR = signals/
 HEADERS      = -I $(MINISHELL_DIR) -I $(LIBFT_DIR)
 NAME         = minishell
 RM           = rm -rf
@@ -16,6 +19,9 @@ CFILES = $(wildcard $(MINISHELL_DIR)*.c) \
          $(wildcard $(SHELL_LOOP_DIR)*.c) \
          $(wildcard $(UTILS_DIR)*.c) \
 		 $(wildcard $(PARSING_DIR)*.c)\
+		 $(wildcard $(ERRORS_FREES)*.c)\
+		 $(wildcard $(EXECUTION_DIR)*.c)\
+		 $(wildcard $(SIGNALS_DIR)*.c)\
 
 OFILES = $(CFILES:.c=.o)
 

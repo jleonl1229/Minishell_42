@@ -1,80 +1,82 @@
-/*#include <stdio.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
+typedef struct s_sh_data {
+    char *last_exit_status;
+} t_sh_data;
 
-size_t	ft_strlen(const char *s)
-{
-	size_t	i;
+void cmd_return_status(t_sh_data *sh, char **input) {
+    int i = 0;
+    while (input[i] != NULL) {
+        char *current_pos = input[i];
+        char *found_pos;
+        size_t new_str_len = 0;
+        size_t last_exit_status_len = strlen(sh->last_exit_status);
 
-	i = 0;
-	while (s[i] != '\0')
-	{
-		i++;
-	}
-	return (i);
-}
+        // Calculate the length of the new string
+        while ((found_pos = strstr(current_pos, "_LAST_EXIT_STATUS_")) != NULL) {
+            new_str_len += (found_pos - current_pos) + last_exit_status_len;
+            current_pos = found_pos + strlen("_LAST_EXIT_STATUS_");
+        }
+        new_str_len += strlen(current_pos); // Add the length of the remaining part
 
+        // Allocate memory for the new string
+        char *new_str = (char *)malloc(new_str_len + 1); // +1 for the null terminator
+        if (new_str == NULL) {
+            perror("malloc");
+            exit(EXIT_FAILURE);
+        }
 
-size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
-{
-	size_t	length;
-	size_t	i;
+        // Build the new string
+        char *new_str_ptr = new_str;
+        current_pos = input[i];
+        while ((found_pos = strstr(current_pos, "_LAST_EXIT_STATUS_")) != NULL) {
+            size_t prefix_len = found_pos - current_pos;
 
-	length = ft_strlen(src);
-	i = 0;
-	if (dstsize == 0)
-		return (length);
-	while (i < dstsize - 1 && src[i] != '\0')
-	{
-		dst[i] = src[i];
-		i++;
-	}
-	dst[i] = '\0';
-	return (length);
-}
+            // Copy the prefix
+            strncpy(new_str_ptr, current_pos, prefix_len);
+            new_str_ptr += prefix_len;
 
-void	remove_quotes(char *element)
-{
-	int	i;
-	int	in_dquotes;
-	int	in_squotes;
+            // Copy the last exit status
+            strcpy(new_str_ptr, sh->last_exit_status);
+            new_str_ptr += last_exit_status_len;
 
-	i = 0;
-	in_dquotes = 0;
-	in_squotes = 0;
-	printf("element length is: %ld\n", strlen(element));
-	while (element[i]) //hello"wor'ld"'te"st'
-	{
-		if (element[i] == '\"' && in_squotes == 0)
-		{
-			in_dquotes = !in_dquotes;
-			ft_strlcpy(&element[i], (const char *)&element[i + 1], ft_strlen(&element[i]));
-			continue; //skips the "i++" 
-		}
-		else if (element[i] == '\'' && in_dquotes == 0)
-		{
-			in_squotes = !in_squotes;
-			ft_strlcpy(&element[i], (const char *)&element[i + 1], ft_strlen(&element[i]));
-			continue;
-		}
-		i++;
-	}
-	printf("element length is: %ld\n", strlen(element));
+            // Move the current position pointer
+            current_pos = found_pos + strlen("_LAST_EXIT_STATUS_");
+        }
 
+        // Copy the remaining part of the original string
+        strcpy(new_str_ptr, current_pos);
+
+        // Free the old string and update the pointer
+        free(input[i]);
+        input[i] = new_str;
+
+        i++;
+    }
 }
 
 int main() {
-    // Example input array of modifiable strings
-    char *test = strdup("hello\"wor'ld\"'te\"st'");
+    // Example usage
+    t_sh_data sh;
+    sh.last_exit_status = "0";
 
-    printf("Before:\n");
-	printf("test is: %s\n", test);
+    char *input[] = {
+        strdup("cat"),
+        strdup("hola_LAST_EXIT_STATUS_"),
+        strdup("_LAST_EXIT_STATUS_"),
+        strdup("hello_LAST_EXIT_STATUS_HAHA"),
+        strdup("_LAST_EXIT_STATUS_ + _LAST_EXIT_STATUS_"),
+        NULL
+    };
 
-    remove_quotes(test);
+    cmd_return_status(&sh, input);
 
-    printf("\nAfter:\n");
-	printf("test is: %s\n", test);
+    for (int i = 0; input[i] != NULL; i++) {
+        printf("input[%d] = %s\n", i, input[i]);
+        free(input[i]); // Don't forget to free the memory after use
+    }
 
     return 0;
-}*/
+}
