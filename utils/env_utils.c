@@ -27,6 +27,7 @@ int env_quotes(char c, int *single_q, int *double_q, int *j)
 **	returns the value of an environment variable if its name has been found
 **	returns an empty string if no var_name has been found or no value has been assigned.
 **	ft_strdup failure will be handled in the calling func
+**	the flag parameter is used to know if char *var_name needs to be freed or not
 **	auxiliary to env_parse()
 */
 char *find_env_pair(t_env *head, char *var_name) 
@@ -64,8 +65,10 @@ t_env	*env_create_node(char *var_name, char *var_content)
 		free(new_node);
 		return NULL;
 	}
-    if (var_content == NULL)
+    if (var_content == NULL) //unassigned var
         new_node->env_value = NULL;
+	else if (ft_strlen(var_content) == 0) //empty string
+		new_node->env_value = ft_strdup("");
     else
 	{
 		new_node->env_value = ft_strdup(var_content);
@@ -97,3 +100,38 @@ void	env_add_node(t_env **header, t_env *new_node)
 		temp = temp->next;
 	temp->next = new_node;
 }
+
+size_t	env_count_char(const char *s, char c)
+{
+	size_t	count;
+
+	count = 0;
+	while (s[count] != c && s[count] != '\0')
+		count++;
+	return (count);
+}
+
+char **env_split(const char *s, char c)
+{
+    char **pointer;
+    size_t substr_length;
+
+    pointer = malloc(sizeof(char *) * 3); //hardcode 2 substr + 1 for NULL
+    if (pointer == NULL)
+        return (NULL);
+    substr_length = env_count_char(s, c);
+    pointer[0] = malloc(sizeof(char) * (substr_length + 1));
+    if (pointer[0] == NULL)
+        return (free_matrix(pointer));
+    ft_strlcpy(pointer[0], s, substr_length + 1);
+    s += substr_length;
+    if (*s == c)
+        s++;
+    pointer[1] = malloc(sizeof(char) * (ft_strlen(s) + 1));
+    if (pointer[1] == NULL)
+        return (free_matrix(pointer));
+    ft_strlcpy(pointer[1], s, ft_strlen(s) + 1);
+    pointer[2] = NULL;
+    return (pointer);
+}
+

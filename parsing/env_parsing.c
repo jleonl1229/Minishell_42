@@ -40,7 +40,7 @@ char	*expanded_var (char **env_pair, char *input, int *start)
 /*
 **	var_name is freed on find_env_pair for function max lines purposes
 */
-char **get_var_content(char *input, int start, t_env *head)
+char **get_var_content(char *input, int start, t_sh_data *sh)
 {
 	int var_len;
 	char *var_name;
@@ -71,9 +71,9 @@ char **get_var_content(char *input, int start, t_env *head)
 	}
 	//printf("var_name is: %s\n", var_name);
 	if (ft_strncmp(var_name, "?", ft_strlen(var_name)) == 0 && ft_strlen(var_name) == ft_strlen("?"))
-		var_content = ft_strdup("_LAST_EXIT_STATUS_");
+		var_content = ft_strdup(sh->last_exit_status/*"_LAST_EXIT_STATUS_"*/);
 	else
-    	var_content = find_env_pair(head, var_name) ;
+    	var_content = find_env_pair(sh->env_header, var_name); 
 	if (var_content == NULL)
 		return free_matrix(result);
     result[1] = var_content;
@@ -81,7 +81,7 @@ char **get_var_content(char *input, int start, t_env *head)
 	return result;
 }
 
-char *act_on_dollar(char *input, int *j, t_env *env_list)
+char *act_on_dollar(char *input, int *j, t_sh_data *sh)
 {
     char *old_input;
     char **env_pair;
@@ -91,7 +91,7 @@ char *act_on_dollar(char *input, int *j, t_env *env_list)
 	//printf("act_on_dollar(): input is: %s\n", input);
     old_input = input;
     i = (*j) +1;
-	env_pair = get_var_content(input, i, env_list);
+	env_pair = get_var_content(input, i, sh);
 	int k = 0;
 	while(env_pair[k] != NULL)
 	{
@@ -102,7 +102,7 @@ char *act_on_dollar(char *input, int *j, t_env *env_list)
 	if (env_pair == NULL)
 		return NULL;		
 	input = expanded_var(env_pair, input, j);
-	printf("input after expanded_var is: %s\n", input);
+	//printf("input after expanded_var is: %s\n", input);
 	if (input == NULL)
 	{
         free_matrix(env_pair);
@@ -116,7 +116,7 @@ char *act_on_dollar(char *input, int *j, t_env *env_list)
 **	if command is "<infile cat | wc -l >out"
 **	char **input is: ["<", "infile", "cat"]
 */
-char  **env_parse (int single_q, int double_q, char **input, t_env *env_list )
+char  **env_parse (int single_q, int double_q, char **input, t_sh_data *sh)
 {
 	int i;
 	int j;
@@ -131,7 +131,7 @@ char  **env_parse (int single_q, int double_q, char **input, t_env *env_list )
 				continue;
 			if (input[i][j] == '$' && single_q == 0)
             {
-                input[i] = act_on_dollar(input[i], &j, env_list);
+                input[i] = act_on_dollar(input[i], &j, sh);
                 if (input[i] == NULL)
                     return NULL;
             }

@@ -89,7 +89,7 @@ int get_input(t_sh_data *sh, char *line, int e_pipe)
         e_pipe = 0;
         signal_received = 0;
     }
-    printf("line is: %s\n", line);
+    //printf("line is: %s\n", line);
     return (save_to_history(sh, line, e_pipe));
 }
 
@@ -108,6 +108,12 @@ void shell_loop(t_sh_data **sh)
     e_pipe = 0;
     while (1)
     {
+        /*t_env *temp = (*sh)->env_header;
+        while (temp != NULL)
+        {
+            printf("%s=%s\n", temp->env_name, temp->env_value);
+            temp = temp->next;
+        }*/
        /* if (isatty(0)) {
         printf("STDIN is a terminal\n");
         } else {
@@ -137,7 +143,6 @@ void shell_loop(t_sh_data **sh)
         if ((*sh)->parsed_header == NULL) //SIGINT caught at the heredoc level
             continue;
         piping(*sh);
-        printf("sh->last_exit_status is: %s\n", (char*)(*sh)->last_exit_status);
         //frees before starting loop again
         free(line);
         free((*sh)->new_line);

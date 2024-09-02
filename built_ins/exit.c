@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
+/*#include <unistd.h>
 #include <signal.h>
 
 int main(int ac, char **av)
@@ -20,4 +20,4 @@ int main(int ac, char **av)
     parent = getppid();
     kill(parent, SIGKILL);
     return (0);
-}
+}*/

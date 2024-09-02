@@ -104,7 +104,7 @@ t_parsed_data *parsing(t_sh_data *sh)
 		split_space = ft_split_quotes(pipe_segments[i++], ' ');
         if (split_space == NULL)
             parsing_cleanup(&sh, pipe_segments, 0);
-        split_space = env_parse (0, 0, split_space, sh->env_header);
+        split_space = env_parse (0, 0, split_space, sh);
         if (split_space == NULL)
             parsing_cleanup(&sh, pipe_segments, split_space);
 		parse_line(&sh, &head, split_space, pipe_segments);

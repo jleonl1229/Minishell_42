@@ -1,10 +1,11 @@
 #include "../minishell.h"
 
 
-/*makes a copy of env and stores it in a linked list data structure.
-t_sh_data gets a pointer to the head
+/*
+**  makes a copy of env and stores it in a linked list data structure.
+**  t_sh_data gets a pointer to the head
 */
-t_env *dup_env(char **envp, t_env *header, t_sh_data **sh)
+t_env *parse_env(char **envp, t_env *header, t_sh_data **sh)
 {
     char *var_name;
     char *var_content;
@@ -12,10 +13,9 @@ t_env *dup_env(char **envp, t_env *header, t_sh_data **sh)
     char **org;
     t_env *new_node;
 
-    int i = 0;
     while (*envp != NULL)
     {
-        a_env = ft_split(*envp, '=');
+        a_env = env_split(*envp, '=');
         org = a_env;
         if (a_env == NULL || *a_env == NULL)
             pre_parse_cleanup(sh, header, org);
@@ -27,33 +27,68 @@ t_env *dup_env(char **envp, t_env *header, t_sh_data **sh)
         env_add_node(&header, new_node);
         free_matrix(org);
         envp++;
-        i++;
     }
     return header;
 }
 
-/* ** (MORE CODE WILL BE ADDED HERE AS WE ADVANCE ON THE PROJECT)
-    **  to be done before infinite loop, when program is launched
-    **  @param1:    
+/*
+** removing OLDPWD from env_vars, same as a fresh Bash session
+**
+*/
+char **populate_env (char **envp)
+{
+    int i;
+    char **env;
+
+    i = 0;
+    while (envp[i] != NULL)
+        i++;
+    env = malloc(sizeof(char *) * (i + 1));
+    if (env == NULL)
+        return NULL;
+    i = 0;
+    while (envp[i] != NULL)
+    {
+        if (ft_strnstr(envp[i], "OLDPWD=", 7) != NULL)
+        {
+            i++;
+            continue;
+        }
+        env[i] = ft_strdup(envp[i]);
+        if (env[i] == NULL)
+            return NULL;
+        i++;
+    }
+    env[i] = NULL;
+    return env;
+}
+
+
+/*
+**  isatty checks if minishell input coming from terminal
+**  the OLDPWD env_var is removed, just like in Bash when a new session is started
 */
 void shell_init(t_sh_data **sh, char **envp)
 {
     t_env *header;
 
     header = NULL;
-    if (!isatty(STDIN_FILENO)) //safeguard that checks if minishell input coming from terminal
+    if (!isatty(STDIN_FILENO))
     {
         free(*sh);
         perror("terminal is not STDIN");
 		exit(EXIT_SUCCESS);
     }
     (*sh)->env_header = NULL;
-    (*sh)->prev_line = NULL; //only null when initialized
+    (*sh)->prev_line = NULL;
     (*sh)->parsed_header = NULL;
     (*sh)->new_line = NULL;
-    (*sh)->env_header = dup_env(envp, header, sh); //copies envp in sh->env_header
-    (*sh)->env = envp;
+    (*sh)->env_header = parse_env(envp, header, sh);
+    unset_remove_tenv("OLDPWD", &((*sh)->env_header), 1);
+    (*sh)->env = populate_env(envp);
+    if ((*sh)->env == NULL)
+        printf("free&exit function goes here\n");
     (*sh)->last_exit_status = ft_strdup("0");
-    //(*sh)->env = tenv_to_char((*sh)->env_header); // stupid me did not contemplate the possibility above
-
+    if ((*sh)->last_exit_status == NULL)
+        printf("free&exit function goes here\n");
 }

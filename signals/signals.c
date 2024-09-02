@@ -46,6 +46,22 @@ void	blocking_cmd_sig(void)
 	signal(SIGQUIT, sig_blocking_handler);
 }
 
+void heredoc_signals(void)
+{
+	struct sigaction sa;
+
+    sa.sa_handler = heredoc_sigint;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+
+    if (sigaction(SIGINT, &sa, NULL) == -1) {
+        perror("sigaction");
+        exit(1);
+    }
+
+    signal(SIGQUIT, SIG_IGN);
+}
+
 void heredoc_sigint(int sig)
 {
     (void)sig;

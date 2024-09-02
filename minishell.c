@@ -1,13 +1,7 @@
 
 #include "minishell.h"
 
-/*if PATH is null the shell can't execute non-built-in programs, 
-    but should this check be made in a future step and here just check if env is null? Probably yes
-    PATH can be deleted with this command: "unset PATH"
-    envp can be null, and so no PATH be found
-    env can be non null, but no PATH be found
-
-*/
+//checks if every env_var or PATH have been deleted
 void env_checker(char **envp, t_sh_data **sh)
 {
     int path_found;
@@ -43,7 +37,7 @@ void	argc_checker(int argc, t_sh_data **sh)
     {
         free(*sh);
         *sh = NULL;
-        printf("Invalid argument count. Usage: ./minishell"); //to be replaced by fd_printf
+        printf("Invalid argument count. Usage: ./minishell\n");
         exit(EXIT_SUCCESS);
     }
 
@@ -53,8 +47,13 @@ int main(int argc, char **argv, char **envp)
 {
     t_sh_data *sh;
 
+    (void)argv;
     sh = (t_sh_data *)malloc(sizeof(t_sh_data));
-    printf("argv[0] is: %s\n", argv[0]); //to be replaced by (void)argv
+    if (sh == NULL)
+    {
+        perror("main");
+        exit(1);
+    }
     argc_checker(argc, &sh);
     env_checker(envp, &sh);
     shell_init(&sh, envp);

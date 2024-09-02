@@ -351,21 +351,13 @@ char    **extract_path(t_sh_data *sh)
 */
 int fill_path(t_sh_data *sh, t_parsed_data *node)
 {
-    const char *builtin[] = {"echo", "cd", "pwd", "export", "unset", "env", "exit", NULL};
-    int i;
     char **env_path;
     char *path;
 
-    i = 0;
-    while(builtin[i] != NULL)
+    if (is_builtin(node->cmd[0]) == 1)
     {
-        if (ft_strncmp(node->cmd[0], builtin[i], ft_strlen(node->cmd[0])) == 0 
-        && ft_strlen(node->cmd[0]) == ft_strlen(builtin[i]))
-        {
-            node->path = ft_strdup(node->cmd[0]); //unprotected
-            return 1;
-        }
-        i++;
+        node->path = ft_strdup(node->cmd[0]); //unprotected
+        return 1;
     }
     env_path = extract_path(sh);
     if (env_path == NULL)

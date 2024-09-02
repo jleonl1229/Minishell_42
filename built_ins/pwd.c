@@ -1,13 +1,14 @@
-#include <stdio.h>
-#include <limits.h>
+#include "../minishell.h"
 
-int main(void)
+int	mini_pwd(void)
 {
-	char cwd[PATH_MAX];
+	char	pwd[MAX_PATH];
 
-	if (getcwd(cwd, PATH_MAX) != NULL)
-		printf("%s\n", cwd);
-	else
-		return (printf("Error"), 1);
+	if (getcwd(pwd, MAX_PATH) == NULL)
+	{
+		perror("pwd");
+		return 1;
+	}
+	printf("%s\n", pwd);
 	return (0);
 }

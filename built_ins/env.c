@@ -10,20 +10,28 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
+#include "../minishell.h"
 
-extern char **environ;  
-
-int main(void)
+/*
+**  what happens if user creates an env? will sh->env be updated and hold that variable?
+**  likely not, so need to think about how to solve that
+*/
+int	mini_env(t_sh_data *sh)
 {
-    int i = 0;
-    char *env_var;
-
-    while ((env_var = environ[i]) != NULL)
+    t_env *temp;
+    if (sh->parsed_header->cmd[1] != NULL)
     {
-        printf("%s\n", env_var);
-        i++;
+        printf("Usage: env\n");
+        return 1;
     }
-
-    return (0);
+    if (sh == NULL || sh->env == NULL)
+        return 1;
+    temp = sh->env_header;
+    while (temp != NULL)
+    {
+        if (temp->env_value != NULL)
+            printf("%s=%s\n", temp->env_name, temp->env_value);
+        temp = temp->next;
+    }
+    return 0;
 }
