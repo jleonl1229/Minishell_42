@@ -2,7 +2,8 @@
 
 
 //util for space_and_chars() 
-void skip_spaces(char *str, int *index) {
+void skip_spaces(char *str, int *index) 
+{
     while (str[*index] != '\0' && (str[*index] == 32 || (str[*index]) == 9))
 		(*index)++;
 }
@@ -16,22 +17,18 @@ void skip_quotes(char *str, int *index)
     (*index)++;
     while (str[*index] != '\0' && str[*index] != quote_char)
         (*index)++;
-  // if (str[*index] == quote_char) //skip closing quote
-      //  (*index)++;
 }
 
 /*
 Validates that special characters are not separated by spaces or tabs (except for '| >' and '| <')
 Example: 'cat | | cat' results in a syntax error
 */
-int	space_and_chars(char *line)
+int	space_and_chars(char *line, int i)
 {
-	int	i;
 	const char *special_chars;
 	char c;
 	
 	special_chars = "<>|";
-	i = 0;
 	while (line[i] != '\0')
 	{
 		if (line[i] == 39 || line[i] == 34) //double or single quotes

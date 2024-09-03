@@ -1,5 +1,6 @@
 #include <unistd.h> //write, read, access, dup, dup2, execve, fork, pipe, unlink
 #include <sys/wait.h> //wait, waitpid
+#include <sys/stat.h> //stat
 #include <fcntl.h> //open, close
 #include <stdlib.h> // malloc, free 
 #include <stdio.h> // perror
@@ -78,17 +79,18 @@ void	child_process(t_sh_data *sh, t_parsed_data *header, int fd[2]);
 void piping(t_sh_data *sh);
 
 //execution/rstatus.c
-char *rs_alloc_new_str(char *input, int lex_len);
+/*char *rs_alloc_new_str(char *input, int lex_len);
 char *rs_build_new_str(char *input, t_sh_data *sh, char *new_str, int lex_len);
-void cmd_return_status(t_sh_data *sh, char **input);
+void cmd_return_status(t_sh_data *sh, char **input);*/
 
 //parsing/parsing.c
 char **split_by_pipe(char *line, int start, int segment_index, int i);
 void parse_line(t_sh_data **sh, t_parsed_data **header, char **split_space, char **pipe_segments);
-t_parsed_data *parsing(t_sh_data *sh);
+t_parsed_data *parsing(t_sh_data *sh, t_parsed_data *head, int i);
 
 //parsing/env_parsing.c
 char	*expanded_var (char **env_pair, char *input, int *start);
+char **alloc_get_var_content(char *input, int var_len, int start, char **var_name);
 char **get_var_content(char *input, int start, t_sh_data *sh);
 char *act_on_dollar(char *input, int *j, t_sh_data *sh);
 char  **env_parse (int single_q, int double_q, char **input, t_sh_data *sh);
@@ -177,23 +179,21 @@ void pre_parse_cleanup(t_sh_data **sh, t_env *header, char **org);
 void    free_parsing_list(t_sh_data **sh);
 void parsing_cleanup(t_sh_data **sh, char **pipe_segments, char **split_space);
 void frees_before_next_ite(char *line, t_sh_data **sh);
+void free_hdoc_sigint(t_parsed_data *node, t_sh_data *sh, char **p_seg, char **splt_sp);
+result free_parse_redir(result res, int flag, t_parsed_data *parsed_data);
 
 //utils/env_utils.c
 t_env	*env_create_node(char *var_name, char *var_content);
+t_env *env_add_value (t_env *new_node, char *var_content);
 void	env_add_node(t_env **header, t_env *new_node);
 int env_quotes(char c, int *single_q, int *double_q, int *j);
 char *find_env_pair(t_env *head, char *var_name);
 size_t	env_count_char(const char *s, char c);
 char **env_split(const char *s, char c);
 
-//utils/env_utils2.c || OVERCOMPLICATED MYSELF, KEEPING THESE IN JUST IN CASE
-//char *env_concat(t_env *env, char **envp);
-//char **alloc_char_env(t_env *header);
-//char **tenv_to_char(t_env *header);
-
 //utils/input_utils.c
 int	bad_initial_char(char *line, t_sh_data **sh);
-int	bad_final_char(char *line, t_sh_data **sh);
+int	bad_final_char(char *line, t_sh_data **sh, int result);
 int is_open_quotes(char *line);
 int	is_space(char *line);
 int invalid_sequence(char *line, int i, int count);
@@ -201,7 +201,7 @@ int invalid_sequence(char *line, int i, int count);
 //utils/input_utils2.c
 void skip_spaces(char *str, int *index);
 void skip_quotes(char *str, int *index);
-int	space_and_chars(char *line);
+int	space_and_chars(char *line, int i);
 int sized2_invalid(char *line);
 int valid_not_implemented(char *line);
 
@@ -224,11 +224,11 @@ char **alloc_cpy_segment(char **segment);
 int mod_cpy_segment(char **cpy_segment, int i, t_parsed_data *parsed_data, char **segment);
 int redir_fd(t_parsed_data *parsed_data, int *redir, char *file, char *redir_type);
 int handle_redir(char *redir, char *file, t_parsed_data *parsed_data);
-result parse_redir(t_parsed_data *parsed_data, char **split_space);
+result parse_redir(t_parsed_data *parsed_data, char **split_space, int i, int sentinel);
 result cmd_arr(char **cpy_segment, int i, int count);
 int fill_cmd_and_args(int i, t_parsed_data *node, char **cmd) ;
 int is_absolute_path(t_parsed_data *node);
-char *path_is_exec(t_parsed_data *node, char **env_value );
+char *path_is_exec(t_parsed_data *node, char **env_value, char *end);
 char    **extract_path(t_sh_data *sh);
 int fill_path(t_sh_data *sh, t_parsed_data *node);
 int parse_cmd_and_path(t_sh_data *sh, t_parsed_data *node, char **segment, char **cpy_segment);

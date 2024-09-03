@@ -52,6 +52,36 @@ char *find_env_pair(t_env *head, char *var_name)
     return ft_strdup("\"\"");
 }
 
+t_env *env_add_value (t_env *new_node, char *var_content)
+{
+	if (var_content == NULL) //unassigned var
+        new_node->env_value = NULL;
+	else if (ft_strlen(var_content) == 0) //empty string
+	{
+		new_node->env_value = ft_strdup("");
+		{
+			if (new_node->env_value == NULL)
+			{
+				free(new_node->env_name);
+				free(new_node);
+				return NULL;
+			}
+		}
+	}
+    else
+	{
+		new_node->env_value = ft_strdup(var_content);
+		if (new_node->env_value == NULL)
+		{
+			free(new_node->env_name);
+			free(new_node);
+			return NULL;
+		}
+	}
+	return new_node;
+}
+
+
 t_env	*env_create_node(char *var_name, char *var_content)
 {
 	t_env	*new_node;
@@ -65,20 +95,9 @@ t_env	*env_create_node(char *var_name, char *var_content)
 		free(new_node);
 		return NULL;
 	}
-    if (var_content == NULL) //unassigned var
-        new_node->env_value = NULL;
-	else if (ft_strlen(var_content) == 0) //empty string
-		new_node->env_value = ft_strdup("");
-    else
-	{
-		new_node->env_value = ft_strdup(var_content);
-		if (new_node->env_value == NULL)
-		{
-			free(new_node->env_name);
-			free(new_node);
-			return NULL;
-		}
-	}
+	new_node = env_add_value(new_node, var_content);
+	if (new_node == NULL)
+		return NULL;
 	new_node->next = NULL;
 	return (new_node);
 }

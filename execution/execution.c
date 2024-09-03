@@ -75,6 +75,8 @@ int is_builtin(char *cmd)
 
 void execute_builtin(t_sh_data *sh)
 {
+    free(sh->last_exit_status);
+
     if (ft_strncmp(sh->parsed_header->path, "echo", ft_strlen("echo")) == 0)
         sh->last_exit_status = ft_itoa(mini_echo(sh));
     else if (ft_strncmp(sh->parsed_header->path, "cd", ft_strlen("cd")) == 0)
@@ -225,7 +227,6 @@ void	piping(t_sh_data *sh)
                     perror("dup2-2");
                 close(fd[0]);
                 close(fd[1]);
-                printf("this code\n");
                 free(sh->last_exit_status);
                 sh->last_exit_status = ft_strdup("127");
                 header = header->next;

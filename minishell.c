@@ -61,7 +61,7 @@ int main(int argc, char **argv, char **envp)
     //to be included in a function, probably:
     free_env_list(sh->env_header);
     free_matrix(sh->env);
-    free(sh->last_exit_status);
+    //free(sh->last_exit_status); 
     free(sh->prev_line);
     free(sh); //malloced in main
     return 0;

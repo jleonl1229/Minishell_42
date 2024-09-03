@@ -53,7 +53,7 @@ int save_to_history(t_sh_data *sh, char *line, int e_pipe)
             if (sh->prev_line == NULL || (ft_strncmp(line, sh->prev_line, ft_strlen(sh->prev_line)) != 0
             || ft_strncmp(line, sh->prev_line, ft_strlen(line)) != 0))
             {
-               if (bad_final_char(line, &sh) != 7 && ignore_history(line) == 0)
+               if (bad_final_char(line, &sh, 0) != 7 && ignore_history(line) == 0)
                     add_history(line);
                 free(sh->prev_line);
                 sh->prev_line = ft_strdup(line);
@@ -118,7 +118,7 @@ void shell_loop(t_sh_data **sh, int checker, int e_pipe)
             e_pipe = 1;
             continue;
         }
-        (*sh)->parsed_header = parsing(*sh);
+        (*sh)->parsed_header = parsing(*sh, NULL, 0);
         if ((*sh)->parsed_header == NULL)
             continue;
         piping(*sh);

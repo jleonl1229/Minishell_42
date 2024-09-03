@@ -108,3 +108,22 @@ void frees_before_next_ite(char *line, t_sh_data **sh)
     (*sh)->new_line = NULL;
     free_parsing_list(sh);
 }
+
+void free_hdoc_sigint(t_parsed_data *node, t_sh_data *sh, char **p_seg, char **splt_sp)
+{
+    free(node);
+    free(sh->new_line);
+    free_matrix(p_seg);
+    free_matrix(splt_sp);
+}
+result free_parse_redir(result res, int flag, t_parsed_data *parsed_data)
+{
+    free_tlist(parsed_data->here_doc);
+    free_matrix(res.str_arr);
+    res.str_arr = NULL;
+    if (flag == -1)
+        res.error_code = 2;
+    else
+        res.error_code = 1;
+    return res;
+}

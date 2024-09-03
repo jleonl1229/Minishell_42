@@ -70,16 +70,14 @@ int	bad_initial_char(char *line, t_sh_data **sh)
 	returns 1 if mentioned char is found, 0 otherwise
 
 */
-int	bad_final_char(char *line, t_sh_data **sh)
+int	bad_final_char(char *line, t_sh_data **sh, int result)
 {
-	int result;
 	const char *space_chars;
 	char	*trimmed;
 	int sz;
 	char c;
 
-	result = 0;
-	space_chars = " \t\n\v\f\r"; //space in the beginning, rest are 9,10,11,12,13 ASCII
+	space_chars = " \t\n\v\f\r";
 	trimmed = ft_strtrim((const char *)line, space_chars);
 	sz = ft_strlen(trimmed);
 	if (ft_strlen(trimmed) == 0) // to prevent bugs from line == empty string
@@ -126,7 +124,7 @@ int is_open_quotes (char *line)
 	}
 	if (single_q || double_q)
 	{
-		printf("syntax error: unclosed quotes\n"); //to be changed by fd_printf, stderror
+		printf("syntax error: unclosed quotes\n");
 		return 1;
 	}
 	return 0;
