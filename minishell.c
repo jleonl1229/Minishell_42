@@ -57,6 +57,12 @@ int main(int argc, char **argv, char **envp)
     argc_checker(argc, &sh);
     env_checker(envp, &sh);
     shell_init(&sh, envp);
-    shell_loop(&sh);
+    shell_loop(&sh, -1, 0);
+    //to be included in a function, probably:
+    free_env_list(sh->env_header);
+    free_matrix(sh->env);
+    free(sh->last_exit_status);
+    free(sh->prev_line);
+    free(sh); //malloced in main
     return 0;
 }

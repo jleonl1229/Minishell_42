@@ -52,7 +52,7 @@ void unset_remove_tenv(char *arg, t_env **env, int set)
 }
 
 //one for the char **
-void unset_remove_shenv(t_sh_data *sh,/*char *arg*/int set)
+void unset_remove_shenv(char **env, int set)
 {
     int i;
 
@@ -63,14 +63,14 @@ void unset_remove_shenv(t_sh_data *sh,/*char *arg*/int set)
         return;
     }
     //printf("sh->env[%d] is: %s\n", set, sh->env[set])*/
-    free(sh->env[set]);
+    free(env[set]);
     i = set;
-    while (sh->env[i + 1] != NULL)
+    while (env[i + 1] != NULL)
     {
-        sh->env[i] = sh->env[i + 1];
+        env[i] = env[i + 1];
         i++;
     }
-    sh->env[i] = NULL;
+    env[i] = NULL;
 }
 
 /*
@@ -110,7 +110,7 @@ int mini_unset(t_sh_data *sh)
         if (is_simple_cmd(sh) == 1)
         {
             unset_remove_tenv(arg, &(sh->env_header), set);
-            unset_remove_shenv(sh, /*arg,*/ set);
+            unset_remove_shenv(sh->env, /*arg,*/ set);
         }
     }
     return 0;

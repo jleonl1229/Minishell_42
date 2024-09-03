@@ -19,12 +19,6 @@ void handle_sigint(int sig)
 	}
 }
 
-void	def_signals(void)
-{
-	signal(SIGINT, handle_sigint);
-	signal(SIGQUIT, SIG_IGN);
-	//printf("in def_signals\n");
-}
 
 void	sig_blocking_handler(int sig)
 {
@@ -76,8 +70,23 @@ void e_pipe_sig_handler(int sig)
 	(void)sig;
 	signal_received = 3;
 }
-void ending_pipe_sig(void)
-{
-	signal(SIGINT, e_pipe_sig_handler);
-}
 
+/*
+**	called at the beginning of shell_loop()
+**	if signal_received == 0, no signal has been triggered before
+**	if signal_received == 2, an ending pipe has been registered and custom
+**	signals need to be applied	
+*/
+void default_signals(void)
+{
+	if (signal_received == 0)
+    {
+		signal(SIGINT, handle_sigint);
+		signal(SIGQUIT, SIG_IGN);
+	}
+    else if (signal_received == 2)
+    {
+		signal_received = 0;
+        signal(SIGINT, e_pipe_sig_handler);
+    }
+}

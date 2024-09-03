@@ -89,44 +89,24 @@ int get_input(t_sh_data *sh, char *line, int e_pipe)
         e_pipe = 0;
         signal_received = 0;
     }
-    //printf("line is: %s\n", line);
     return (save_to_history(sh, line, e_pipe));
 }
 
 /*
-**  def_signals() inside loop to restart to the signal handler defined in def_signals.
-**  otherwise had problems with sig_blocking_cmd()
-** ""(*sh)->parsed_header == NULL"" will be true if SIGINT caught in heredoc
+**  blocking_cmd_sig() registers specific signal handling for blocking commands (example:
+**  cat without arguments, which waits for user input).
+**  checker = 0 means: user entered invalid input, an empty string or only space
+**  checker = 7 means: user entered a command with an ending pipe
+**  ""(*sh)->parsed_header == NULL"" will be true if SIGINT caught in heredoc
 */
-void shell_loop(t_sh_data **sh)
+void shell_loop(t_sh_data **sh, int checker, int e_pipe)
 {
     char *line;
-    int e_pipe;
-    int checker;
 
     line = NULL;
-    e_pipe = 0;
     while (1)
     {
-        /*t_env *temp = (*sh)->env_header;
-        while (temp != NULL)
-        {
-            printf("%s=%s\n", temp->env_name, temp->env_value);
-            temp = temp->next;
-        }*/
-       /* if (isatty(0)) {
-        printf("STDIN is a terminal\n");
-        } else {
-        printf("STDIN is not a terminal\n");
-        }*/
-        //printf("signal received is: %d\n", signal_received);
-        if (signal_received == 0) //default value, no signal triggered
-            def_signals();
-        else if (signal_received == 2) //ending pipe registered
-        {
-            signal_received = 0;
-            ending_pipe_sig();
-        }
+        default_signals();
         e_pipe = get_input(*sh, line, e_pipe);
         blocking_cmd_sig();
         checker = input_validation((*sh)->prev_line, sh);
@@ -139,58 +119,14 @@ void shell_loop(t_sh_data **sh)
             continue;
         }
         (*sh)->parsed_header = parsing(*sh);
-        //printf("sh->parsed_header = %s\n", (char *)(*sh)->parsed_header);
-        if ((*sh)->parsed_header == NULL) //SIGINT caught at the heredoc level
+        if ((*sh)->parsed_header == NULL)
             continue;
         piping(*sh);
-        //frees before starting loop again
-        free(line);
-        free((*sh)->new_line);
-        (*sh)->new_line = NULL;
-        free_parsing_list(sh);
+        frees_before_next_ite(line, sh);
         if (ft_strncmp((*sh)->prev_line, "exit", ft_strlen("exit")) == 0)
         {
             write(1, "exit\n", ft_strlen("exit\n"));
             break;
         }
-        //write(1, (*sh)->prev_line, ft_strlen((*sh)->prev_line));
-        //write(1, "\n",1);
     }
-    //frees when exiting program successfully
-    free_env_list((*sh)->env_header);
-    free((*sh)->prev_line);
-    free(*sh); //malloced in main
-
-    
-    
 }
-
-//THIS CODE GOES BETWEEN piping() and "frees before starting loop again"
-/*int i;
-        while((*sh)->parsed_header != NULL)
-        {
-            printf("sh->parsed_header->path is: %s\n", (*sh)->parsed_header->path);
-            i = 0;
-            if ((*sh)->parsed_header->cmd != NULL)
-            {
-                while((*sh)->parsed_header->cmd[i] != NULL)
-                {
-                    printf("sh->parsed_header->cmd %d is: %s\n", i, (*sh)->parsed_header->cmd[i]);
-                    i++;
-                }
-            }
-            printf("sh->parsed_header->simple_in_redir is: %d\n", (*sh)->parsed_header->simple_in_redir);
-            printf("sh->parsed_header->simple_out_redir is: %d\n", (*sh)->parsed_header->simple_out_redir);
-            t_list *temp;
-            temp = (*sh)->parsed_header->here_doc;
-            while (temp != NULL)
-            {
-                printf("sh->parsed_header->here_doc is: %s\n", (char *)temp->content);
-                temp = temp->next;
-            }
-            printf("sh->parsed_header->here_doc is: %p\n", temp);
-            printf("sh->parsed_header->append is: %d\n", (*sh)->parsed_header->append);
-            printf("sh->parsed_header->next is: %p\n", (void *)(*sh)->parsed_header->next);           
-            (*sh)->parsed_header = (*sh)->parsed_header->next;
-             printf("sh->parsed_header is %p\n", (*sh)->parsed_header);
-        }*/

@@ -226,6 +226,7 @@ void	piping(t_sh_data *sh)
                 close(fd[0]);
                 close(fd[1]);
                 printf("this code\n");
+                free(sh->last_exit_status);
                 sh->last_exit_status = ft_strdup("127");
                 header = header->next;
                 continue;
@@ -249,7 +250,10 @@ void	piping(t_sh_data *sh)
             if (wait(&status) == -1)
                 perror("wait()");
             if (WIFEXITED(status))
+            {
+                free(sh->last_exit_status);
                 sh->last_exit_status = ft_itoa(WEXITSTATUS(status));
+            }
         }
             close(fd[1]);
             if (dup2(fd[0], STDIN_FILENO) == -1)

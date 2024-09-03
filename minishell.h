@@ -103,7 +103,7 @@ int ignore_history(char *line);
 int append_line(t_sh_data *sh, char *line);
 int save_to_history(t_sh_data *sh, char *line, int e_pipe);
 int get_input(t_sh_data *sh, char *line, int e_pipe);
-void shell_loop(t_sh_data **sh);
+void shell_loop(t_sh_data **sh, int checker, int e_pipe);
 
 //built_ins/env.c
 int	mini_env(t_sh_data *sh);
@@ -130,7 +130,7 @@ void mini_export_execve_edition(t_sh_data *sh, int set, char *cmd);
 
 //built_ins/unset.c
 int mini_unset(t_sh_data *sh);
-void unset_remove_shenv(t_sh_data *sh,/*char *arg*/int set);
+void unset_remove_shenv(char **env, int set);
 void unset_remove_tenv(char *arg, t_env **env, int set);
 t_env *free_node_unset(t_env *node);
 
@@ -153,13 +153,12 @@ int	mini_pwd(void);
 
 //signals/signals.c
 void handle_sigint(int sig);
-void	def_signals(void);
 void	sig_blocking_handler(int sig);
 void	blocking_cmd_sig(void);
 void heredoc_signals(void);
 void heredoc_sigint(int sig);
 void e_pipe_sig_handler(int sig);
-void ending_pipe_sig(void);
+void default_signals(void);
 
 //shell_loop/input_validation.c
 char three_invalid_print(char *line, char *last_invalid);
@@ -177,6 +176,7 @@ void free_env_list(t_env *head);
 void pre_parse_cleanup(t_sh_data **sh, t_env *header, char **org);
 void    free_parsing_list(t_sh_data **sh);
 void parsing_cleanup(t_sh_data **sh, char **pipe_segments, char **split_space);
+void frees_before_next_ite(char *line, t_sh_data **sh);
 
 //utils/env_utils.c
 t_env	*env_create_node(char *var_name, char *var_content);

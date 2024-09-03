@@ -39,8 +39,10 @@ char **populate_env (char **envp)
 {
     int i;
     char **env;
+    int rem;
 
     i = 0;
+    rem = -1;
     while (envp[i] != NULL)
         i++;
     env = malloc(sizeof(char *) * (i + 1));
@@ -50,16 +52,15 @@ char **populate_env (char **envp)
     while (envp[i] != NULL)
     {
         if (ft_strnstr(envp[i], "OLDPWD=", 7) != NULL)
-        {
-            i++;
-            continue;
-        }
+            rem = i;
         env[i] = ft_strdup(envp[i]);
         if (env[i] == NULL)
             return NULL;
         i++;
     }
     env[i] = NULL;
+    if (rem != -1)
+        unset_remove_shenv(env, rem);
     return env;
 }
 
