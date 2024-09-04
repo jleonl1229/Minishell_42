@@ -75,6 +75,7 @@ typedef struct s_sh_data
 }   t_sh_data;
 
 //execution/execution.c
+void child_out_redir(t_parsed_data *header, int fd[2]);
 void	child_process(t_sh_data *sh, t_parsed_data *header, int fd[2]);
 void    exec_invalid_infile(t_sh_data *sh, int fd[2], t_parsed_data ** header);
 void prepare_next_cmd(t_parsed_data *header, int fd[2]);
@@ -162,6 +163,9 @@ int mini_cd(t_parsed_data *header, t_sh_data *sh);
 
 //built_ins/pwd.c
 int	mini_pwd(void);
+
+//built_ins/exit.c
+int mini_exit(t_parsed_data *header, t_sh_data *sh);
 
 //signals/signals.c
 void handle_sigint(int sig);

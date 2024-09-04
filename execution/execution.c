@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   execution.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/09/04 15:56:34 by mzuloaga          #+#    #+#             */
+/*   Updated: 2024/09/04 16:00:52 by mzuloaga         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
 
@@ -15,6 +27,33 @@ void    exec_invalid_infile(t_sh_data *sh, int fd[2], t_parsed_data ** header)
     free(sh->last_exit_status);
     sh->last_exit_status = ft_strdup("1");
     *header = (*header)->next;
+}
+
+void child_out_redir(t_parsed_data *header, int fd[2])
+{
+    if (header->next != NULL) //more commands in the pipeline
+    {
+        if (header->last_fd != -2)
+        {
+            if (dup2(header->last_fd, STDOUT_FILENO) == -1)
+                perror("dup2() - child process - last_fd stdout1");
+            close(header->last_fd);
+        }
+        else
+        {
+            if (dup2(fd[1], STDOUT_FILENO) == -1)
+                perror("dup2() - child process - fd[1] stdout");
+        }
+	}
+	else if (header->next == NULL) //last command
+	{
+        if (header->last_fd != -2)
+        {
+            if (dup2(header->last_fd, STDOUT_FILENO) == -1)
+                perror("dup2() - child process - last_fd stdout2");
+            close(header->last_fd);
+        }
+	}
 }
 
 /*
@@ -37,29 +76,7 @@ void	child_process(t_sh_data *sh, t_parsed_data *header, int fd[2])
         close(header->simple_in_redir);
     }
     //outfile redir
-	if (header->next != NULL) //more commands in the pipeline
-	{
-        if (header->last_fd != -2)
-        {
-            if (dup2(header->last_fd, STDOUT_FILENO) == -1)
-                perror("dup2() - child process - last_fd stdout1");
-            close(header->last_fd);
-        }
-		else
-        {
-            if (dup2(fd[1], STDOUT_FILENO) == -1)
-                perror("dup2() - child process - fd[1] stdout");
-        }
-	}
-	else if (header->next == NULL) //last command
-	{
-        if (header->last_fd != -2)
-        {
-            if (dup2(header->last_fd, STDOUT_FILENO) == -1)
-                perror("dup2() - child process - last_fd stdout2");
-            close(header->last_fd);
-        }
-	}
+	child_out_redir(header, fd);
 	close(fd[1]);
     //cmd_return_status(sh, sh->parsed_header->cmd);
     if (execve(header->path, header->cmd, sh->env) == -1)

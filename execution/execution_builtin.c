@@ -18,16 +18,20 @@ int is_builtin(char *cmd)
     return 0;
 }
 
+/*
+**  first if condition because: "cd | exit" should return the exit status
+*   of the previous command
+*/
 void call_builtin(t_parsed_data *header, t_sh_data *sh)
 {
-    free(sh->last_exit_status);
-
+    if (ft_strncmp(header->path, "exit", ft_strlen("exit")) != 0)
+        free(sh->last_exit_status);
     if (ft_strncmp(header->path, "echo", ft_strlen("echo")) == 0)
         sh->last_exit_status = ft_itoa(mini_echo(header));
     else if (ft_strncmp(header->path, "cd", ft_strlen("cd")) == 0)
         sh->last_exit_status = ft_itoa(mini_cd(header, sh));
     else if (ft_strncmp(header->path, "exit", ft_strlen("exit")) == 0)
-        printf("sh->last_exit_status == mini_exit()\n");
+        sh->last_exit_status = ft_itoa(mini_exit(header, sh));
     else if (ft_strncmp(header->path, "pwd", ft_strlen("pwd")) == 0)
         sh->last_exit_status = ft_itoa(mini_pwd());
     else if (ft_strncmp(header->path, "env", ft_strlen("env")) == 0)
