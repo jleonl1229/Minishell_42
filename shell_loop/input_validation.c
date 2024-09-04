@@ -58,7 +58,7 @@ Input can be invalid because quotes are not closed (ex. <" '>),
 certain chars are at the beginning ("|") or end of line(">"),
 there is a non-valid sequence(||) or there are spaces between invalid sequence ("< <")
 
-Returns 0 if not valid
+Returns 0 if not valid, 1 if valid and 7 if user inputed command ends with a pipe
 */
 int input_validation(char *line, t_sh_data **sh)
 {
@@ -67,13 +67,13 @@ int input_validation(char *line, t_sh_data **sh)
     if (*line == '\0' || is_space(line) == 1 
     ||is_open_quotes(line) == 1 || valid_not_implemented(line) == 1
     || bad_initial_char(line, sh) == 1
-    || invalid_sequence(line, 0, 0) == 1|| space_and_chars(line) == 1 
+    || invalid_sequence(line, 0, 0) == 1|| space_and_chars(line, 0) == 1 
     || sized2_invalid(line) == 1)
         return 0;
-    e_pipe = bad_final_char(line, sh);
+    e_pipe = bad_final_char(line, sh, 0);
     if (e_pipe == 1)
         return 0;
-    else if (e_pipe == 7) //we have an ending pipe prompt
+    else if (e_pipe == 7)
         return 7;
     return 1;
 }

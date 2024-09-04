@@ -12,7 +12,7 @@
 
  #include "../minishell.h"
 
-
+// adds node to the bottom of the linked list
  void parse_add_node(t_parsed_data **head, t_parsed_data *new_node) 
  {
      t_parsed_data *current;
@@ -154,16 +154,14 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
  /*
  **  Takes the original segment, fills the struct with redirection data
  **  and fills a copy of char **segment with modified data to ignore
- **  already parsed data
+ **   the already parsed data
+ ** 988 indicates infile is from hdoc
  */
- result parse_redir(t_parsed_data *parsed_data, char **split_space)
+ result parse_redir(t_parsed_data *parsed_data, char **split_space, int i, int sentinel)
 {
-    int i;
-    int sentinel;
     result res;
     int new_fd;
     
-    i = 0;
     res.str_arr = alloc_cpy_segment(split_space);
     if (res.str_arr == NULL)
     {
@@ -172,32 +170,12 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
     }
     sentinel =  mod_cpy_segment(res.str_arr, i, parsed_data, split_space);
     if (sentinel == -1)
-    {
-        free_tlist(parsed_data->here_doc);
-        free_matrix(res.str_arr);
-        res.str_arr = NULL;
-        res.error_code = 2;
-        return res;
-    }
+        return (free_parse_redir(res, sentinel, parsed_data));
     if (parsed_data->here_doc != NULL)
     {
         new_fd = heredoc_to_infile(parsed_data->here_doc);
-        if (new_fd == -1)
-        {
-            free_tlist(parsed_data->here_doc);
-            free_matrix(res.str_arr);
-            res.str_arr = NULL;
-            res.error_code = 2;
-            return res;
-        }
-        else if (new_fd == -2) //SIGINT caught
-        {
-            free_tlist(parsed_data->here_doc);
-            free_matrix(res.str_arr);
-            res.str_arr = NULL;
-            res.error_code = 1;
-            return res;
-        }
+        if (new_fd == -1 || new_fd == -2)
+            return (free_parse_redir(res, new_fd, parsed_data));  
         if (parsed_data->simple_in_redir != -1 && parsed_data->simple_in_redir == 988)
             parsed_data->simple_in_redir = new_fd;
         else
@@ -205,7 +183,7 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
         free_tlist(parsed_data->here_doc);
     }
     res.error_code = 0;
-     return res;
+    return res;
 }
 
 
@@ -273,17 +251,31 @@ int fill_cmd_and_args(int i, t_parsed_data *node, char **cmd)
     return 1;
 }
 
+/*
+**  checks if inputed command has a valid absolute path to an executable
+**  the stat() function helps differentiate executables from directories.
+**  previously had a bug where "/home/user" would return true, even if it's a directory
+**  about the stat function:
+**      the struct holds info about the file (type, permissions, etc.)
+**      path_stat is populated with this information
+**      S_ISREG_ checks if file is a regular file (not a directory or special file)
+**  returns 1 if there is an executable, 0 otherwise
+*/
 int is_absolute_path(t_parsed_data *node)
 {
-    if (node->cmd[0][0] == '/')
+    struct stat path_stat;
+
+    if (node->cmd[0][0] == '/' || (node->cmd[0][0] == '.' && 
+    (node->cmd[0][1] == '/' || node->cmd[0][1] == '.')))
     {
-        if (access(node->cmd[0], X_OK) == 0)
+        if (stat(node->cmd[0], &path_stat) == 0)
         {
-            node->path = ft_strdup(node->cmd[0]);
-            return 1;
+            if (S_ISREG(path_stat.st_mode) && access(node->cmd[0], X_OK) == 0)
+            {
+                node->path = ft_strdup(node->cmd[0]);
+                return 1;
+            }
         }
-        else
-            return 0;
     }
     return 0;
 
@@ -291,12 +283,12 @@ int is_absolute_path(t_parsed_data *node)
 
 /*
 **  if no path has been found for cmd, it returns NULL and program keeps going
-**  the execution part will be responsible for printing a no cmd path error
+**  as the execution part will be responsible for printing a "no cmd path error"
+**  it returns -1 when there's been a malloc failure.
 */
-char *path_is_exec(t_parsed_data *node, char **env_value )
+char *path_is_exec(t_parsed_data *node, char **env_value, char *end)
 {
 	char	*path_cmd;
-	char	*end;
 
     if (is_absolute_path(node) == 1||ft_strlen(node->cmd[0]) == 0)
         return (NULL);
@@ -323,6 +315,10 @@ char *path_is_exec(t_parsed_data *node, char **env_value )
 	return (NULL);
 }
 
+/*
+**  gets the PATH env_var from the env_vars linked list
+**  and splits it into a char **
+*/
 char    **extract_path(t_sh_data *sh)
 {
     t_env *current;
@@ -346,31 +342,24 @@ char    **extract_path(t_sh_data *sh)
 }
 
 /*
-**  fills absolute path to cmd executable. if the cmd is a builtin cmd it fills the path
-**  with the builtin name
+**  fills the path to executable data of the t_parsed_node.
+**  if the cmd is a builtin cmd it fills the path with the builtin name
+**  returns 1 if no error, 0 if malloc failure
 */
 int fill_path(t_sh_data *sh, t_parsed_data *node)
 {
-    const char *builtin[] = {"echo", "cd", "pwd", "export", "unset", "env", "exit", NULL};
-    int i;
     char **env_path;
     char *path;
 
-    i = 0;
-    while(builtin[i] != NULL)
+    if (is_builtin(node->cmd[0]) == 1)
     {
-        if (ft_strncmp(node->cmd[0], builtin[i], ft_strlen(node->cmd[0])) == 0 
-        && ft_strlen(node->cmd[0]) == ft_strlen(builtin[i]))
-        {
-            node->path = ft_strdup(node->cmd[0]); //unprotected
-            return 1;
-        }
-        i++;
+        node->path = ft_strdup(node->cmd[0]); //unprotected
+        return 1;
     }
     env_path = extract_path(sh);
     if (env_path == NULL)
         return 0;
-    path = path_is_exec(node, env_path);
+    path = path_is_exec(node, env_path, NULL);
     free_matrix(env_path);
     if(node->path != NULL) //meaning that path is absolute
         return 1;
@@ -384,11 +373,14 @@ int fill_path(t_sh_data *sh, t_parsed_data *node)
 }
 
  /*
- **  
- **  @param1: char **cpy_segment is of size char **segment and is
-                           filled with values "0" (if redir data) and "1" (if cmd + args)
-                        
- **
+ **  params:
+ **     char **segment -> ["echo", "hello", ">", "outfile.txt", NULL]
+ **     char **cpy_segment-> ["1", "1", "0", "0", NULL]                        
+ ** cmd_arr() -> creates a new arr where cmd + args will be stored
+ ** fill_cmd_and_args() -> fills the t_parsed_node struct with cmd + args data
+ ** fill_path() -> adds the path to the executable to the t_parsed_node
+ ** cmd.error_code 1 --> count 0, meaning there's no command to parse
+ ** cmd.error_code 2 --> malloc failure
  */
  int parse_cmd_and_path(t_sh_data *sh, t_parsed_data *node, char **segment, char **cpy_segment)
  {
@@ -399,9 +391,9 @@ int fill_path(t_sh_data *sh, t_parsed_data *node)
     i = 0;
     j = 0;
     cmd = cmd_arr(cpy_segment, 0, 0);
-    if (cmd.error_code == 1) //count == 0
+    if (cmd.error_code == 1)
         return 0;
-    else if (cmd.error_code == 2) //malloc error
+    else if (cmd.error_code == 2)
         return -1;
     while(segment[i] != NULL)
     {
@@ -415,7 +407,6 @@ int fill_path(t_sh_data *sh, t_parsed_data *node)
         free_matrix(cmd.str_arr);
         return -1;
     }
-	//free_matrix(cpy_segment);
 	free_matrix(cmd.str_arr);
     return 1;
  }

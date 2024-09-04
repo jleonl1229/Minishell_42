@@ -8,6 +8,7 @@ minishell.h
 minishell_libft
 minishell.o
 out
+out1
 parsing
 readline.supp
 shell_init
@@ -16,4 +17,4 @@ signals
 test
 tesy
 utils
-yes sir
+hello

@@ -43,8 +43,8 @@
  copies the old string into a new string taking into
  consideration the spaces around special chars
  */
- void fill_new_line(char **new_line, char *line, int in_squote, int in_dquote)
-  {
+void fill_new_line(char **new_line, char *line, int in_squote, int in_dquote)
+{
      int i;
      int j;
      int len;
@@ -71,16 +71,16 @@
          i++;
      }
      (*new_line)[j] = '\0';
- }
+}
 
- /*
- from "<cat<<cat|cat" to " < cat << cat | cat". Adds spaces around
- special chars.
- new_line is saved in the t_sh_data struct
- I forgot why is this useful
- */
- void add_space(t_sh_data *sh)
- {
+/*
+** from "<cat<<cat|cat" to " < cat << cat | cat". Adds spaces around
+**  special chars.
+**  new_line is saved in the t_sh_data struct
+**  I forgot why is this useful
+*/
+void add_space(t_sh_data *sh)
+{
     int new_len;
     char *new_line;
     int len;
@@ -98,4 +98,5 @@
         pre_parse_cleanup (&sh, 0, 0);
     }
     free(new_line);
- }
+}
+

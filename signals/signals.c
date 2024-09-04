@@ -19,19 +19,19 @@ void handle_sigint(int sig)
 	}
 }
 
-void	def_signals(void)
-{
-	signal(SIGINT, handle_sigint);
-	signal(SIGQUIT, SIG_IGN);
-	//printf("in def_signals\n");
-}
 
 void	sig_blocking_handler(int sig)
 {
 	if (sig == SIGINT)
+	{
 		handle_sigint(-7);
+		signal_received = 6;
+	}
 	else if (sig == SIGQUIT)
+	{
 		write(2, "Quit (core dumped)\n", 19);
+		signal_received = 7;
+	}
 }
 
 /*
@@ -40,10 +40,26 @@ void	sig_blocking_handler(int sig)
 **		1. cat (without arguments): waits for user input
 **		2.	sleep: pauses execution for a specified amount of time
 */
-void	blocking_cmd_sig(void)
+void	blocking_cmd_sig()
 {
 	signal(SIGINT, sig_blocking_handler);
 	signal(SIGQUIT, sig_blocking_handler);
+}
+
+void heredoc_signals(void)
+{
+	struct sigaction sa;
+
+    sa.sa_handler = heredoc_sigint;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+
+    if (sigaction(SIGINT, &sa, NULL) == -1) {
+        perror("sigaction");
+        exit(1);
+    }
+
+    signal(SIGQUIT, SIG_IGN);
 }
 
 void heredoc_sigint(int sig)
@@ -60,8 +76,23 @@ void e_pipe_sig_handler(int sig)
 	(void)sig;
 	signal_received = 3;
 }
-void ending_pipe_sig(void)
-{
-	signal(SIGINT, e_pipe_sig_handler);
-}
 
+/*
+**	called at the beginning of shell_loop()
+**	if signal_received == 0, no signal has been triggered before
+**	if signal_received == 2, an ending pipe has been registered and custom
+**	signals need to be applied	
+*/
+void default_signals(void)
+{
+	if (signal_received == 0)
+    {
+		signal(SIGINT, handle_sigint);
+		signal(SIGQUIT, SIG_IGN);
+	}
+    else if (signal_received == 2)
+    {
+		signal_received = 0;
+        signal(SIGINT, e_pipe_sig_handler);
+    }
+}

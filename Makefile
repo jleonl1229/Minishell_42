@@ -10,6 +10,7 @@ PARSING_DIR = parsing/
 ERRORS_FREES = errors_frees/
 EXECUTION_DIR = execution/
 SIGNALS_DIR = signals/
+BUILTINS_DIR = built_ins/
 HEADERS      = -I $(MINISHELL_DIR) -I $(LIBFT_DIR)
 NAME         = minishell
 RM           = rm -rf
@@ -22,6 +23,7 @@ CFILES = $(wildcard $(MINISHELL_DIR)*.c) \
 		 $(wildcard $(ERRORS_FREES)*.c)\
 		 $(wildcard $(EXECUTION_DIR)*.c)\
 		 $(wildcard $(SIGNALS_DIR)*.c)\
+		 $(wildcard $(BUILTINS_DIR)*.c)\
 
 OFILES = $(CFILES:.c=.o)
 

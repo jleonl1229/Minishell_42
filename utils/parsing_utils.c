@@ -1,37 +1,48 @@
- #include "../minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parsing_utils.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/09/04 18:31:32 by mzuloaga          #+#    #+#             */
+/*   Updated: 2024/09/04 18:34:48 by mzuloaga         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "../minishell.h"
 
- /*
+/*
  **	removes "external" quotes.
  **	example: "exte'r"nal" --> exte'r"nal
  **	auxiliary to parse_cmd() function
  */
- void	remove_quotes(char *element)
- {
- 	int	i;
- 	int	in_dquotes;
- 	int	in_squotes;
+void	remove_quotes(char *element)
+{
+	int	i;
+	int	in_dquotes;
+	int	in_squotes;
 
- 	i = 0;
- 	in_dquotes = 0;
- 	in_squotes = 0;
- 	while (element[i])
- 	{
- 		if (element[i] == '\"' && in_squotes == 0)
- 		{
- 			in_dquotes = !in_dquotes;
- 			ft_strlcpy(&element[i], (const char *)&element[i + 1], ft_strlen(&element[i]));
- 			continue; //skips the "i++" 
- 		}
- 		else if (element[i] == '\'' && in_dquotes == 0)
- 		{
- 			in_squotes = !in_squotes;
- 			ft_strlcpy(&element[i], (const char *)&element[i + 1], ft_strlen(&element[i]));
- 			continue;
- 		}
- 		i++;
- 	}
- }
+	i = 0;
+	in_dquotes = 0;
+	in_squotes = 0;
+	while (element[i])
+	{
+		if (element[i] == '\"' && in_squotes == 0)
+		{
+			in_dquotes = !in_dquotes;
+			ft_strlcpy(&element[i], (const char *)&element[i + 1], ft_strlen(&element[i]));
+			continue ;
+		}
+		else if (element[i] == '\'' && in_dquotes == 0)
+		{
+			in_squotes = !in_squotes;
+			ft_strlcpy(&element[i], (const char *)&element[i + 1], ft_strlen(&element[i]));
+			continue ;
+		}
+		i++;
+	}
+}
 
  /*Counts number of pipe segments in a 
  command line instruction.
