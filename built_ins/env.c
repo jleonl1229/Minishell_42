@@ -16,10 +16,10 @@
 **  what happens if user creates an env? will sh->env be updated and hold that variable?
 **  likely not, so need to think about how to solve that
 */
-int	mini_env(t_sh_data *sh)
+int	mini_env(t_parsed_data *header, t_sh_data *sh)
 {
     t_env *temp;
-    if (sh->parsed_header->cmd[1] != NULL)
+    if (header->cmd[1] != NULL)
     {
         printf("Usage: env\n");
         return 1;

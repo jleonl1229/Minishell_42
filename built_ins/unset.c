@@ -85,26 +85,19 @@ void unset_remove_shenv(char **env, int set)
 **      3. 
 */
 
-int mini_unset(t_sh_data *sh)
+int mini_unset(t_parsed_data *header, t_sh_data *sh)
 {
     char **cmd;
     char *arg;
     int set;
 
-    cmd = sh->parsed_header->cmd;
+    cmd = header->cmd;
     if (cmd[1] == NULL)
         return 0;
     while (*(++cmd) != NULL)
     {
         arg = *cmd;
         set = is_var_set(sh->env_header, arg);
-        /*printf("set is: %d\n", set);
-        int k = 0;
-        while(sh->env[k] != NULL)
-        {
-            printf("sh->env[%d]. %s\n", k, sh->env[k]);
-            k++;
-        }*/
         if (set == -1)
             return 0;
         if (is_simple_cmd(sh) == 1)

@@ -140,12 +140,12 @@ int chdir_oldpwd(t_sh_data *sh, char *old_dir)
     return res;
 }
 
-int chdir_basecase(t_sh_data *sh, char *old_dir)
+int chdir_basecase(t_parsed_data *header, t_sh_data *sh, char *old_dir)
 {
 	char **cmd;
 	int res;
 
-	cmd = sh->parsed_header->cmd;
+	cmd = header->cmd;
 	if (access(cmd[1], F_OK) == 0)
 	{
 		if (is_directory(cmd[1]))
@@ -174,12 +174,12 @@ int chdir_basecase(t_sh_data *sh, char *old_dir)
 **		equivalent to doing: "cd "$OLDPWD" && pwd"
 **	haven't implemented functionality for the tilde char (~, shorthand for the home dir path)
 */
-int do_cd(t_sh_data *sh, char *pwd)
+int do_cd(t_parsed_data *header, t_sh_data *sh, char *pwd)
 {
 	int res;
 	char **cmd;
 
-	cmd = sh->parsed_header->cmd;
+	cmd = header->cmd;
 	if (cmd[1] == NULL || (ft_strncmp(cmd[1], "--", ft_strlen("--")) == 0 
 	&& ft_strlen("--") == ft_strlen(cmd[1])))
 		res = chdir_home(sh, pwd);
@@ -188,7 +188,7 @@ int do_cd(t_sh_data *sh, char *pwd)
 	else if (ft_strncmp(cmd[1], "-", ft_strlen("-")) == 0 && ft_strlen("-") == ft_strlen(cmd[1]))
 		res = chdir_oldpwd(sh, pwd);
 	else
-		res = chdir_basecase(sh, pwd);
+		res = chdir_basecase(header, sh, pwd);
 	if (res !=0)
 		res = 1;
 	return res;
@@ -197,13 +197,13 @@ int do_cd(t_sh_data *sh, char *pwd)
 /*
 **	pwd is the old_dir, to be passed as parameter between aux functions
 */
-int mini_cd(t_sh_data *sh)
+int mini_cd(t_parsed_data *header, t_sh_data *sh)
 {
 	char pwd[MAX_PATH];
 
 	if (getcwd(pwd, MAX_PATH) == NULL)
 		return 1;
 	if (is_simple_cmd(sh) == 1)
-		return (do_cd(sh, pwd));
+		return (do_cd(header, sh, pwd));
 	return 1;
 }

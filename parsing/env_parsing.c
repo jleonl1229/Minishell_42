@@ -83,6 +83,7 @@ char **get_var_content(char *input, int start, t_sh_data *sh)
 		return free_matrix(result);
     result[1] = var_content;
     result[2] = NULL;
+	free(var_name);
 	return result;
 }
 

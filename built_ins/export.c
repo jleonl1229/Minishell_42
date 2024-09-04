@@ -80,17 +80,17 @@ void no_arg_export(t_env *env)
 **  new env_vars. 
 **      1. linked list or char **env as source of up to date env_vars
 **      2. char ** as a source of up to date env_vars
-**      1. sh->parsed_header->cmd to get the cmd + its args
+**      1. header->cmd to get the cmd + its args
 */
 
-int mini_export (t_sh_data *sh)
+int mini_export (t_parsed_data *header, t_sh_data *sh)
 {
     char *arg;
     char **cmd;
     char **env_var;
     int set;
 
-    cmd = sh->parsed_header->cmd;
+    cmd = header->cmd;
     if (cmd[1] == NULL || ft_strlen(cmd[1]) == 0)
     {
         no_arg_export(sh->env_header);

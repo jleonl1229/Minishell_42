@@ -48,7 +48,6 @@ char *find_env_pair(t_env *head, char *var_name)
         }
 		current = current->next;
     }
-    free(var_name);
     return ft_strdup("\"\"");
 }
 

@@ -9,16 +9,15 @@
 **	happen because write() doesn't use buffers
 */
 
-int mini_echo(t_sh_data *sh)
+int mini_echo(t_parsed_data *header)
 {
     char **cmd;
     int i;
     int newline;
 
-    cmd = sh->parsed_header->cmd;
+    cmd = header->cmd;
     i = 1;
     newline = 1;
-
     if (cmd[1] == NULL)  // "echo" only
     {
         ft_putendl_fd("", STDOUT_FILENO);

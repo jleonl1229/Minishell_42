@@ -106,6 +106,18 @@ void shell_loop(t_sh_data **sh, int checker, int e_pipe)
     line = NULL;
     while (1)
     {
+        //TO BE TESTED:
+        /*if (signal_received == 1 || signal_received == 6 || signal_received == 3)
+        {
+            printf("here\n");
+            free((*sh)->last_exit_status);
+            (*sh)->last_exit_status = ft_strdup("130");
+        }
+        else if (signal_received == 7)
+        {
+            free((*sh)->last_exit_status);
+            (*sh)->last_exit_status = ft_strdup("131");
+        }*/
         default_signals();
         e_pipe = get_input(*sh, line, e_pipe);
         blocking_cmd_sig();

@@ -23,9 +23,15 @@ void handle_sigint(int sig)
 void	sig_blocking_handler(int sig)
 {
 	if (sig == SIGINT)
+	{
 		handle_sigint(-7);
+		signal_received = 6;
+	}
 	else if (sig == SIGQUIT)
+	{
 		write(2, "Quit (core dumped)\n", 19);
+		signal_received = 7;
+	}
 }
 
 /*
@@ -34,7 +40,7 @@ void	sig_blocking_handler(int sig)
 **		1. cat (without arguments): waits for user input
 **		2.	sleep: pauses execution for a specified amount of time
 */
-void	blocking_cmd_sig(void)
+void	blocking_cmd_sig()
 {
 	signal(SIGINT, sig_blocking_handler);
 	signal(SIGQUIT, sig_blocking_handler);

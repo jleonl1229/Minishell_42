@@ -16,11 +16,13 @@
 #define MAX_PATH 4096 //used for getcwd()
 
 /*
-** int value reference for global var:
-** 0: default value, default signals applied
-** 1: heredoc SIGINT catcher
-** 2: register ending pipe signal 
-** 3: ending pipe SIGINT catcher 
+**  int value reference for global var:
+**  0: default value, default signals applied
+**  1: heredoc SIGINT catcher, also updates sh->last_exit_status (130)
+**  2: register ending pipe signal 
+**  3: ending pipe SIGINT catcher 
+**  6: blocking cmd SIGINT catcher, used to update sh->last_exit_status (130)
+**  7: blocking cmd SIGQUIT catcher, used to update sh->last_exit_status (131)
 */
 extern int signal_received; //global var for signals
 
@@ -73,10 +75,18 @@ typedef struct s_sh_data
 }   t_sh_data;
 
 //execution/execution.c
-int is_builtin(char *cmd);
-void execute_builtin(t_sh_data *sh);
 void	child_process(t_sh_data *sh, t_parsed_data *header, int fd[2]);
+void    exec_invalid_infile(t_sh_data *sh, int fd[2], t_parsed_data ** header);
+void prepare_next_cmd(t_parsed_data *header, int fd[2]);
+int exec_manage_parent(t_sh_data *sh, t_parsed_data **header, int fd[2]);
+int exec_reinit_loop(t_sh_data *sh, t_parsed_data **header, int fd[2]);
 void piping(t_sh_data *sh);
+
+//execution/execution_builtin.c
+int is_builtin(char *cmd);
+void call_builtin(t_parsed_data *header, t_sh_data *sh);
+void builtin_redirs(int fd[2], t_parsed_data *header);
+int execute_builtin(int fd[2], t_parsed_data **header, t_sh_data *sh);
 
 //execution/rstatus.c
 /*char *rs_alloc_new_str(char *input, int lex_len);
@@ -108,10 +118,10 @@ int get_input(t_sh_data *sh, char *line, int e_pipe);
 void shell_loop(t_sh_data **sh, int checker, int e_pipe);
 
 //built_ins/env.c
-int	mini_env(t_sh_data *sh);
+int	mini_env(t_parsed_data *header, t_sh_data *sh);
 
 //built_ins/export.c
-int mini_export (t_sh_data *sh);
+int mini_export (t_parsed_data *header, t_sh_data *sh);
 void no_arg_export(t_env *env);
 void    env_var_update(char **env_var, t_env *env);
 void    add_env_var(char **env_var, t_env *env);
@@ -131,13 +141,13 @@ char **dup_sh_env(char **env, int set);
 void mini_export_execve_edition(t_sh_data *sh, int set, char *cmd);
 
 //built_ins/unset.c
-int mini_unset(t_sh_data *sh);
+int mini_unset(t_parsed_data *header, t_sh_data *sh);
 void unset_remove_shenv(char **env, int set);
 void unset_remove_tenv(char *arg, t_env **env, int set);
 t_env *free_node_unset(t_env *node);
 
 //built_ins/echo.c
-int mini_echo(t_sh_data *sh);
+int mini_echo(t_parsed_data *header);
 
 //built_ins/cd.c
 char * custom_getenv(t_env *head, const char *name);
@@ -146,9 +156,9 @@ void cd_create_update(char *env_name, char *env_value, t_sh_data *sh, int flag);
 int update_env_directories (t_sh_data *sh, char *old_dir);
 int chdir_home(t_sh_data *sh, char *old_dir);
 int chdir_oldpwd(t_sh_data *sh, char *old_dir);
-int chdir_basecase(t_sh_data *sh, char *old_dir);
-int do_cd(t_sh_data *sh, char *pwd);
-int mini_cd(t_sh_data *sh);
+int chdir_basecase(t_parsed_data *header, t_sh_data *sh, char *old_dir);
+int do_cd(t_parsed_data *header, t_sh_data *sh, char *pwd);
+int mini_cd(t_parsed_data *header, t_sh_data *sh);
 
 //built_ins/pwd.c
 int	mini_pwd(void);
