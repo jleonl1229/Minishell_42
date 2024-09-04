@@ -1,6 +1,6 @@
 #include "../minishell.h"
 
-char *rs_alloc_new_str(char *input, int lex_len)
+/*char *rs_alloc_new_str(char *input, int lex_len)
 {
     int new_str_len;
     char *found;
@@ -68,8 +68,10 @@ void cmd_return_status(t_sh_data *sh, char **input)
         lex_len = 0;
     else
         lex_len = ft_strlen(sh->last_exit_status);
+    printf("last_exit_status. %s\n", sh->last_exit_status);
     while (input[i] != NULL) 
     {
+        printf("input[%d]. %s\n", i, input[i]);
         exp_str = rs_alloc_new_str(input[i], lex_len);
         //printf("ft_strlen(exp_str) is: %ld\n", ft_strlen(exp_str))
         if (exp_str == NULL) //no need to built the new str
@@ -83,4 +85,4 @@ void cmd_return_status(t_sh_data *sh, char **input)
         input[i] = strdup(exp_str);
         i++;
     }
-}
+}*/

@@ -1,74 +1,50 @@
-/*#include "../minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env_utils2.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/09/04 18:06:33 by mzuloaga          #+#    #+#             */
+/*   Updated: 2024/09/04 18:07:45 by mzuloaga         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-OVER COMPLICATED MYSELF, KEEPING THESE JUST IN CASE
+#include "../minishell.h"
 
-char *env_concat(t_env *env, char **envp) 
+size_t	env_count_char(const char *s, char c)
 {
-    int size;
-    char *env_var;
-    int s_value;
-    
-    if (env->env_value == NULL)
-        s_value = 0;
-    else
-        s_value = ft_strlen(env->env_value);
-    size = ft_strlen(env->env_name) + 1 + s_value + 1; // +1 for '=' and +1 for '\0'
-    env_var = malloc(size);
-    if (env_var == NULL)
-    {
-        free_matrix(envp);
-        return NULL;
-    }
-    env_var[0] = '\0';
-    ft_strlcat(env_var, env->env_name, size);
-    ft_strlcat(env_var, "=", size);
-    ft_strlcpy(env_var + ft_strlen(env_var), env->env_value, s_value +1);
+	size_t	count;
 
-    return env_var;
+	count = 0;
+	while (s[count] != c && s[count] != '\0')
+		count++;
+	return (count);
 }
 
-
-char **alloc_char_env(t_env *header)
-{
-    int i;
-    char **env;
-
-    i = 0;
-    while (header != NULL) 
-    {
-        header = header->next;
-        i++;
-    }
-    env = malloc(sizeof(char *) * (i + 1));
-    if (env == NULL)
-        return NULL;
-    return env;
-
-}
-
-char **tenv_to_char(t_env *header) 
-{
-    t_env *temp;
-    int i;
-    char **env_arr; // Pointer to the head of char * array
-
-    temp = header;
-    i = 0;
-    env_arr = alloc_char_env(temp);
-    if (env_arr == NULL)
-        return NULL;
-    while (temp != NULL) 
-    {
-        env_arr[i] = env_concat(temp, env_arr);
-        if (env_arr[i] == NULL) 
-        {
-            printf("alloc_for_env(): env_concat failure\n");
-            return NULL;
-        }
-        i++;
-        temp = temp->next;
-    }
-    env_arr[i] = NULL;
-    return env_arr;
-}
+/*
+**	3 as malloc size because hardcoding 2 for substr + 1 for NULL
 */
+char	**env_split(const char *s, char c)
+{
+	char	**pointer;
+	size_t	substr_length;
+
+	pointer = malloc(sizeof(char *) * 3);
+	if (pointer == NULL)
+		return (NULL);
+	substr_length = env_count_char(s, c);
+	pointer[0] = malloc(sizeof(char) * (substr_length + 1));
+	if (pointer[0] == NULL)
+		return (free_matrix(pointer));
+	ft_strlcpy(pointer[0], s, substr_length + 1);
+	s += substr_length;
+	if (*s == c)
+		s++;
+	pointer[1] = malloc(sizeof(char) * (ft_strlen(s) + 1));
+	if (pointer[1] == NULL)
+		return (free_matrix(pointer));
+	ft_strlcpy(pointer[1], s, ft_strlen(s) + 1);
+	pointer[2] = NULL;
+	return (pointer);
+}

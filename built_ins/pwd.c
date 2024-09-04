@@ -5,21 +5,22 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jleon-la <jleon-la@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/31 11:54:58 by jleon-la          #+#    #+#             */
-/*   Updated: 2024/07/31 11:54:59 by jleon-la         ###   ########.fr       */
+/*   Created: 2024/09/04 19:19:37 by jleon-la          #+#    #+#             */
+/*   Updated: 2024/09/04 19:19:47 by jleon-la         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <limits.h>
+#include "../minishell.h"
 
-int main(void)
+int	mini_pwd(void)
 {
-	char cwd[PATH_MAX];
+	char	pwd[MAX_PATH];
 
-	if (getcwd(cwd, PATH_MAX) != NULL)
-		printf("%s\n", cwd);
-	else
-		return (printf("Error"), 1);
+	if (getcwd(pwd, MAX_PATH) == NULL)
+	{
+		perror("pwd");
+		return 1;
+	}
+	printf("%s\n", pwd);
 	return (0);
 }
