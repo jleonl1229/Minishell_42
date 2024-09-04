@@ -30,5 +30,7 @@ int main(void)
 {
     int res = 256 - (345 % 256);
     printf("%i\n", res);
+	printf("testing\
+	testing\n");
     return (0);
 }*/

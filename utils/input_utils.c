@@ -1,5 +1,16 @@
-#include "../minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   input_utils.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/09/04 18:08:42 by mzuloaga          #+#    #+#             */
+/*   Updated: 2024/09/04 18:31:20 by mzuloaga         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "../minishell.h"
 
 /*
 	checks if user inputed special chars "<", ">" or "||"
@@ -9,52 +20,53 @@
 
 	returns 1 if invalid sequence, 0 otherwise
 */
-int invalid_sequence(char *line, int i, int count)
+int	invalid_sequence(char *line, int i, int count)
 {
-    while (line[i] != '\0')
+	while (line[i] != '\0')
 	{
-        if (line[i] == '<' || line[i] == '>' || line[i] == '|')
+		if (line[i] == '<' || line[i] == '>' || line[i] == '|')
 		{
-            count = 1;
-            while (line[i + 1] == '<' || line[i + 1] == '>'
-			|| line[i + 1] == '|') 
+			count = 1;
+			while (line[i + 1] == '<' || line[i + 1] == '>'
+				|| line[i + 1] == '|')
 			{
-                count++;
-                i++;
-            }
-            if (count > 3)
+				count++;
+				i++;
+			}
+			if (count > 3)
 			{
-				printf("bash invalid_sequence: syntax error near unexpected token '%c'\n", line[i-1]);
-				return 1;
+				printf("bash invalid_sequence: syntax error\
+				near unexpected token '%c'\n", line[i -1]);
+				return (1);
 			}
 			else if (count == 3)
 				return (three_valid(line));
-        }
+		}
 		i++;
-    }
-    return 0;
+	}
+	return (0);
 }
 
 /*
- * Checks if line, after trimming leading whitespace characters,
- * starts with an invalid character.
- * Currently, only the pipe '|' is considered an invalid initial character.
- *
- * Returns 1 if pipe '|' is found as the initial character, 0 otherwise.
+** Checks if line, after trimming leading whitespace characters,
+** starts with an invalid character.
+** Currently, only the pipe '|' is considered an invalid initial character.
+** space_chars -> space in the beginning, rest are 9,10,11,12,13 ASCII
+** Returns 1 if pipe '|' is found as the initial character, 0 otherwise.
  */
 
 int	bad_initial_char(char *line, t_sh_data **sh)
 {
-	int result;
-	const char *space_chars;
-	char	*trimmed;
+	int			result;
+	const char	*space_chars;
+	char		*trimmed;
 
 	result = 0;
-	space_chars = " \t\n\v\f\r"; //space in the beginning, rest are 9,10,11,12,13 ASCII
+	space_chars = " \t\n\v\f\r";
 	trimmed = ft_strtrim((const char *)line, space_chars);
 	if (trimmed == NULL)
 		pre_parse_cleanup(sh, NULL, NULL);
-	if (trimmed[0] == '|') //if more invalid chars are found in the future, add them here
+	if (trimmed[0] == '|')
 	{
 		printf("bash: syntax error near unexpected token `|'\n");
 		result = 1;
@@ -64,36 +76,35 @@ int	bad_initial_char(char *line, t_sh_data **sh)
 }
 
 /*
-	Pretty simmilar to the bad_initial_char (can we put them both in a single function?),
-	but in this case having '<', '|', or '>' as last chars throws syntax error in bash
-
-	returns 1 if mentioned char is found, 0 otherwise
-
+**	Pretty simmilar to the bad_initial_char, but in this case
+**	having '<', '|', or '>' as last chars throws syntax error in bash
+**	returns 1 if mentioned char is found, 0 otherwise
+**	ft_strlen(trimmed) == 0 -> to prevent bugs from line == empty string
 */
 int	bad_final_char(char *line, t_sh_data **sh, int result)
 {
-	const char *space_chars;
-	char	*trimmed;
-	int sz;
-	char c;
+	const char	*space_chars;
+	char		*trimmed;
+	int			sz;
+	char		c;
 
 	space_chars = " \t\n\v\f\r";
 	trimmed = ft_strtrim((const char *)line, space_chars);
 	sz = ft_strlen(trimmed);
-	if (ft_strlen(trimmed) == 0) // to prevent bugs from line == empty string
+	if (ft_strlen(trimmed) == 0)
 	{
 		free(trimmed);
-		return result;
+		return (result);
 	}
 	if (trimmed == NULL)
 		pre_parse_cleanup(sh, NULL, NULL);
-	if (trimmed[sz - 1] == '<' || trimmed[sz -1] == '>'/* || trimmed[sz-1] == '|'*/)
+	if (trimmed[sz - 1] == '<' || trimmed[sz -1] == '>')
 	{
 		c = trimmed[sz -1];
 		result = 1;
-		printf("bash bad_final_char: syntax error near unexpected token '%c'\n", c);
+		printf("bash b_f_char: syntax error near unexpected token '%c'\n", c);
 	}
-	else if (trimmed[sz-1] == '|')
+	else if (trimmed[sz -1] == '|')
 		result = 7;
 	free(trimmed);
 	return (result);
@@ -107,7 +118,7 @@ in the loop, if the condition is triggered 1 becomes 0 and 0 becomes 1
 returns 1 if open quotes found, 0 otherwise
 */
 
-int is_open_quotes (char *line)
+int	is_open_quotes(char *line)
 {
 	int	single_q;
 	int	double_q;
@@ -125,11 +136,10 @@ int is_open_quotes (char *line)
 	if (single_q || double_q)
 	{
 		printf("syntax error: unclosed quotes\n");
-		return 1;
+		return (1);
 	}
-	return 0;
+	return (0);
 }
-
 
 /*
 checks if string is only space. 
@@ -144,7 +154,7 @@ int	is_space(char *line)
 	is_space = 1;
 	while (*line)
 	{
-		if (!((9 <= *line && *line <= 13) || *line == 32)) 
+		if (!((9 <= *line && *line <= 13) || *line == 32))
 		{
 			is_space = 0;
 			break ;
