@@ -6,80 +6,84 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 11:44:20 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/08/19 12:48:05 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/04 19:40:01 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
- #include "../minishell.h"
+#include "../minishell.h"
 
 // adds node to the bottom of the linked list
- void parse_add_node(t_parsed_data **head, t_parsed_data *new_node) 
- {
-     t_parsed_data *current;
-     if (*head == NULL) 
-         *head = new_node;
-     else 
-     {
-         current = *head;
-         while (current->next != NULL)
-             current = current->next;
-         current->next = new_node;
-     }
-     new_node->next = NULL;
- }
+void	parse_add_node(t_parsed_data **head, t_parsed_data *new_node)
+{
+	t_parsed_data	*current;
 
- /*
- **  returns new char ** where the modified
- **  segment will be copied
- **  auxiliary to parse_redir()
- */
- char **alloc_cpy_segment(char **segment)
- {
-     int size;
-     char **cpy_segment;
+	if (*head == NULL)
+		*head = new_node;
+	else
+	{
+		current = *head;
+		while (current->next != NULL)
+			current = current->next;
+		current->next = new_node;
+	}
+	new_node->next = NULL;
+}
 
-     size = 0;
-     while(segment[size] != NULL)
-         size++;
-     cpy_segment = (char **)malloc((size + 1) * sizeof(char *));
-     if (cpy_segment == NULL) 
-         return NULL;
-     return cpy_segment;
- }
+/*
+**  returns new char ** where the modified
+**  segment will be copied
+**  auxiliary to parse_redir()
+*/
+char	**alloc_cpy_segment(char **segment)
+{
+	int		size;
+	char	**cpy_segment;
 
- /*
- **  fills the elements in cpy_segment with "0"s to signal further functions
- **  that we're done with these elements.
- **  @param: char ***cpy_segment is the address of the char ** created
- **                   by alloc_cpy_segment()
- ** auxiliary to parse_redir()
- */
- int mod_cpy_segment(char **cpy_segment, int i, t_parsed_data *parsed_data, char **segment)
- {
-    while (segment[i] != NULL) 
-    {
-        if (ft_strncmp(segment[i], "<", ft_strlen(segment[i])) == 0
-        || ft_strncmp(segment[i], ">", ft_strlen(segment[i])) == 0
-        || ft_strncmp(segment[i], "<<", ft_strlen(segment[i])) == 0
-        || ft_strncmp(segment[i], ">>", ft_strlen(segment[i])) == 0)
-        {
-            if (handle_redir(segment[i], segment[i+1], parsed_data) != 1)
-            {
-                cpy_segment[i] = NULL;
-                return -1;
-            }
-            cpy_segment[i] = ft_strdup("0");
-            cpy_segment[i + 1] = ft_strdup("0");
-            if (cpy_segment[i] == NULL || cpy_segment[i + 1] == NULL)
-                return -1;
-            i += 2;
-        }
-        else
-            if ((cpy_segment[i++] = ft_strdup("1")) == NULL)
-                return -1;
-    }
-    cpy_segment[i] = NULL;
-    return 0;
+	size = 0;
+	while (segment[size] != NULL)
+		size++;
+	cpy_segment = (char **)malloc((size + 1) * sizeof(char *));
+	if (cpy_segment == NULL)
+		return (NULL);
+	return (cpy_segment);
+}
+
+/*
+**  fills the elements in cpy_segment with "0"s to signal further functions
+**  that we're done with these elements.
+**  @param: char ***cpy_segment is the address of the char ** created
+**                   by alloc_cpy_segment()
+** auxiliary to parse_redir()
+*/
+int	mod_cpy_segment(char **cpy_segment, int i, t_parsed_data *parsed_data,
+					char **segment)
+{
+	while (segment[i] != NULL)
+	{
+		if (ft_strncmp(segment[i], "<", ft_strlen(segment[i])) == 0
+			|| ft_strncmp(segment[i], ">", ft_strlen(segment[i])) == 0
+			|| ft_strncmp(segment[i], "<<", ft_strlen(segment[i])) == 0
+			|| ft_strncmp(segment[i], ">>", ft_strlen(segment[i])) == 0)
+		{
+			if (handle_redir(segment[i], segment[i + 1], parsed_data) != 1)
+			{
+				cpy_segment[i] = NULL;
+				return (-1);
+			}
+			cpy_segment[i] = ft_strdup("0");
+			cpy_segment[i + 1] = ft_strdup("0");
+			if (cpy_segment[i] == NULL || cpy_segment[i + 1] == NULL)
+				return (-1);
+			i += 2;
+		}
+		else
+		{
+			if ((cpy_segment[i++] = ft_strdup("1")) == NULL)
+				return -1;			
+		}
+	}
+	cpy_segment[i] = NULL;
+	return (0);
  }
 
 /*
@@ -94,7 +98,7 @@ int redir_fd(t_parsed_data *parsed_data, int *redir, char *file, char *redir_typ
 
     fd = 0;
     if (*redir == -1)
-        return 1;
+        return (1);
     if (*redir != -2 && *redir != 988)
     {
         fd = close(*redir);
