@@ -6,26 +6,26 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 18:06:33 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/09/04 18:07:45 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/05 15:40:17 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
 //auxiliary to the cd builtin
-char * custom_getenv(t_env *head, const char *name)
+char	*custom_getenv(t_env *head, const char *name)
 {
-	t_env *current;
+	t_env	*current;
 
 	current = head;
 	while (current != NULL)
 	{
 		if (ft_strncmp(current->env_name, name, ft_strlen(name)) == 0
-		&& ft_strlen(current->env_name) == ft_strlen(name))
-			return current->env_value;
+			&& ft_strlen(current->env_name) == ft_strlen(name))
+			return (current->env_value);
 		current = current->next;
 	}
-	return NULL;
+	return (NULL);
 }
 
 size_t	env_count_char(const char *s, char c)

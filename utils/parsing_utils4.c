@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 19:29:16 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/09/04 19:38:11 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/05 16:48:42 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int	intermediate_heredoc(t_list **hdoc, char *line)
 			}
 			free(line);
 		}
-		if (signal_received == 1)
+		if (g_signal == 1)
 			return (-2);
 		(*hdoc) = (*hdoc)->next;
 	}
@@ -57,7 +57,7 @@ int	final_hdoc(t_list *hdoc, char *line, int new_fd)
 	{
 		write(1, "> ", 2);
 		line = get_next_line(STDIN_FILENO);
-		if (signal_received)
+		if (g_signal)
 		{
 			close(new_fd);
 			return (-2);

@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 19:40:10 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/09/04 19:43:50 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/05 16:48:28 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,18 +32,17 @@ void	handle_sigint(int sig)
 	}
 }
 
-
 void	sig_blocking_handler(int sig)
 {
 	if (sig == SIGINT)
 	{
 		handle_sigint(-7);
-		signal_received = 6;
+		g_signal = 6;
 	}
 	else if (sig == SIGQUIT)
 	{
 		write(2, "Quit (core dumped)\n", 19);
-		signal_received = 7;
+		g_signal = 7;
 	}
 }
 
@@ -77,34 +76,6 @@ void	heredoc_signals(void)
 void	heredoc_sigint(int sig)
 {
 	(void)sig;
-	signal_received = 1;
+	g_signal = 1;
 	write(1, "\n", 1);
-}
-
-void	e_pipe_sig_handler(int sig)
-{
-	write(1, "\n", 1);
-	write(1, "$ ", 2);
-	(void)sig;
-	signal_received = 3;
-}
-
-/*
-**	called at the beginning of shell_loop()
-**	if signal_received == 0, no signal has been triggered before
-**	if signal_received == 2, an ending pipe has been registered and custom
-**	signals need to be applied	
-*/
-void	default_signals(void)
-{
-	if (signal_received == 0)
-	{
-		signal(SIGINT, handle_sigint);
-		signal(SIGQUIT, SIG_IGN);
-	}
-	else if (signal_received == 2)
-	{
-		signal_received = 0;
-		signal(SIGINT, e_pipe_sig_handler);
-	}
 }

@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 16:06:22 by jleon-la          #+#    #+#             */
-/*   Updated: 2024/09/04 18:38:09 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/05 17:26:11 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,23 +16,23 @@
 **  free_parsing_list -> frees t_parsed_data
 **  free_env_list -> frees t_env data
 */
-void exit_free(t_sh_data **sh)
+void	exit_free(t_sh_data **sh)
 {
-    free_parsing_list(sh);
-    free_env_list((*sh)->env_header);
-    free_matrix((*sh)->env);
-    free((*sh)->prev_line);
-    free((*sh)->new_line);
-    free((*sh)->last_exit_status);
-    free((*sh));
+	free_parsing_list(sh);
+	free_env_list((*sh)->env_header);
+	free_matrix((*sh)->env);
+	free((*sh)->prev_line);
+	free((*sh)->new_line);
+	free((*sh)->last_exit_status);
+	free((*sh));
 }
 
-int mini_exit(t_parsed_data *header, t_sh_data *sh)
+int	mini_exit(t_parsed_data *header, t_sh_data *sh)
 {
-    int i;
-    int res;
+	int	i;
+	int	res;
 
-    i = 0;
+	i = 0;
     if (is_simple_cmd(sh) != 1)
         return (ft_atoi(sh->last_exit_status));
     //if exit has args

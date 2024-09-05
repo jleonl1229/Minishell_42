@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 20:09:45 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/09/04 20:17:58 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/05 17:50:21 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ void	parse_line(t_sh_data **sh, t_parsed_data **header, char **split_space,
 		char **pipe_segments)
 {
 	t_parsed_data	*node;
-	result			res;
+	t_result			res;
 
 	node = (t_parsed_data *)malloc(sizeof(t_parsed_data));
 	if (node == NULL)
@@ -115,9 +115,9 @@ t_parsed_data	*parsing(t_sh_data *sh, t_parsed_data *head, int i)
 		if (split_space == NULL)
 			parsing_cleanup(&sh, pipe_segments, split_space);
 		parse_line(&sh, &head, split_space, pipe_segments);
-		if (signal_received == 1)
+		if (g_signal == 1)
 		{
-			signal_received = 0;
+			g_signal = 0;
 			return (NULL);
 		}
 		free_matrix(split_space);

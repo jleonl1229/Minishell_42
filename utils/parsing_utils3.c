@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 11:44:20 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/09/04 19:40:01 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/05 18:25:22 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,9 +161,9 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
  **   the already parsed data
  ** 988 indicates infile is from hdoc
  */
- result parse_redir(t_parsed_data *parsed_data, char **split_space, int i, int sentinel)
+ t_result parse_redir(t_parsed_data *parsed_data, char **split_space, int i, int sentinel)
 {
-    result res;
+    t_result res;
     int new_fd;
     
     res.str_arr = alloc_cpy_segment(split_space);
@@ -197,9 +197,9 @@ int handle_redir(char *redir, char *file, t_parsed_data *parsed_data)
  ** using a struct to differentiate return values of NULL between malloc error and count == 0
  ** auxiliary to parse_cmd_and_path()
  */
- result cmd_arr(char **cpy_segment, int i, int count)
+ t_result cmd_arr(char **cpy_segment, int i, int count)
  {
-    result res;
+    t_result res;
 
 	while (cpy_segment[i] != NULL)
 	{
@@ -390,7 +390,7 @@ int fill_path(t_sh_data *sh, t_parsed_data *node)
  {
     int i;
     int j;
-    result cmd;
+    t_result cmd;
     
     i = 0;
     j = 0;
