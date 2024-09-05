@@ -12,6 +12,22 @@
 
 #include "../minishell.h"
 
+//auxiliary to the cd builtin
+char * custom_getenv(t_env *head, const char *name)
+{
+	t_env *current;
+
+	current = head;
+	while (current != NULL)
+	{
+		if (ft_strncmp(current->env_name, name, ft_strlen(name)) == 0
+		&& ft_strlen(current->env_name) == ft_strlen(name))
+			return current->env_value;
+		current = current->next;
+	}
+	return NULL;
+}
+
 size_t	env_count_char(const char *s, char c)
 {
 	size_t	count;

@@ -24,6 +24,9 @@ int    is_var_set(t_env *env, char *cmd)
 
 /*
 **  Extracts the variable name and value from the cmd
+**  The if condition inside the while loop will be true if it's
+**  an assigned env_var
+**  else it will be unassigned and also be strduped
 */
 char** get_var_data(char *cmd) 
 {
@@ -31,23 +34,23 @@ char** get_var_data(char *cmd)
     int i;
 
     i = 0;
-    env_var = malloc(sizeof(char *)*3); //unprotected
+    env_var = malloc(sizeof(char *) * 3);
     while (cmd[i] != '\0')
      { 
         if (cmd[i] == '=') 
         { 
-            env_var[0] = (char  *)malloc(i + 1); //unprotected
+            env_var[0] = (char  *)malloc(i + 1);
             ft_strlcpy(env_var[0], cmd, i +1);
-            env_var[1] = (char *)malloc(ft_strlen(cmd) - ft_strlen(env_var[0])); //unprotected
+            env_var[1] = (char *)malloc(ft_strlen(cmd) - ft_strlen(env_var[0]));
             ft_strlcpy(env_var[1], cmd + ft_strlen(env_var[0]) + 1, ft_strlen(cmd) - ft_strlen(env_var[0]));
             env_var[2] = NULL;
             return env_var;
         }
         i++;
     }
-    env_var[0] = ft_strdup(cmd); //unprotected
+    env_var[0] = ft_strdup(cmd);
     env_var[1] = NULL;
-    env_var[2] = NULL; //can I free this? free(env_var[2])
+    env_var[2] = NULL;
     return env_var;
 }
 

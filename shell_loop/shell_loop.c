@@ -91,6 +91,25 @@ int get_input(t_sh_data *sh, char *line, int e_pipe)
     }
     return (save_to_history(sh, line, e_pipe));
 }
+/*
+**  updates last_exit_status to 130 or 131 if a signal has been used
+**  with a blocking cmd
+*/
+void status130_131(t_sh_data *sh)
+{
+    if (signal_received == 1 || signal_received == 6 || signal_received == 3)
+        {
+            free(sh->last_exit_status);
+            sh->last_exit_status = ft_strdup("130");
+            signal_received  = 0;
+        }
+        else if (signal_received == 7)
+        {
+            free(sh->last_exit_status);
+            sh->last_exit_status = ft_strdup("131");
+            signal_received = 0;
+        }
+}
 
 /*
 **  blocking_cmd_sig() registers specific signal handling for blocking commands (example:
@@ -106,18 +125,7 @@ void shell_loop(t_sh_data **sh, int checker, int e_pipe)
     line = NULL;
     while (1)
     {
-        //TO BE TESTED:
-        /*if (signal_received == 1 || signal_received == 6 || signal_received == 3)
-        {
-            printf("here\n");
-            free((*sh)->last_exit_status);
-            (*sh)->last_exit_status = ft_strdup("130");
-        }
-        else if (signal_received == 7)
-        {
-            free((*sh)->last_exit_status);
-            (*sh)->last_exit_status = ft_strdup("131");
-        }*/
+        status130_131(*sh);
         default_signals();
         e_pipe = get_input(*sh, line, e_pipe);
         blocking_cmd_sig();
@@ -135,10 +143,5 @@ void shell_loop(t_sh_data **sh, int checker, int e_pipe)
             continue;
         piping(*sh);
         frees_before_next_ite(line, sh);
-        if (ft_strncmp((*sh)->prev_line, "exit", ft_strlen("exit")) == 0)
-        {
-            write(1, "exit\n", ft_strlen("exit\n"));
-            break;
-        }
     }
 }

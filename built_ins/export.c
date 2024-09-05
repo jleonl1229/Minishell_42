@@ -35,7 +35,7 @@ void    env_var_update(char **env_var, t_env *env)
         && ft_strlen(env->env_name) == ft_strlen(env_var[0]))
         {
             free(env->env_value);
-            env->env_value = strdup(env_var[1]);
+            env->env_value = ft_strdup(env_var[1]);
         }
         env = env->next;
 	}
@@ -72,6 +72,25 @@ void no_arg_export(t_env *env)
 }
 
 /*
+**  set == -1 means its a new env_var
+**  env_var[1] != NULL will be true if it's an assigned var
+*/
+void simple_export(char **env_var, int set, char *arg, t_sh_data *sh)
+{
+    env_var = get_var_data(arg);
+    set = is_var_set(sh->env_header, env_var[0]);
+    mini_export_execve_edition(sh, set, arg);
+    if (set != -1)
+    {
+        if (env_var[1] != NULL)
+            env_var_update(env_var, sh->env_header);
+    }
+    else
+        add_env_var(env_var, sh->env_header);
+    free_matrix(env_var);
+}
+
+/*
 **  export can be used without args (coded no_arg_export()) or with args
 **  if "export" with args -> each arg can be a new env_var (that needs to be added)
 **  params:
@@ -90,38 +109,21 @@ int mini_export (t_parsed_data *header, t_sh_data *sh)
     char **env_var;
     int set;
 
+    env_var = NULL;
     cmd = header->cmd;
+    set = -2;
     if (cmd[1] == NULL || ft_strlen(cmd[1]) == 0)
     {
         no_arg_export(sh->env_header);
         return 0;
     }
-
     while (*(++cmd) != NULL)
     {
         arg = *cmd;
-        printf("arg is: %s\n", arg);
-        if (is_valid_arg_export(arg) == 0) //is invalid
-            return (1); //failure
+        if (is_valid_arg_export(arg) == 0)
+            return (1);
         if (is_simple_cmd(sh) == 1)
-        {
-            env_var = get_var_data(arg); //unprotected
-            printf("env_var[0] is: %s\n", env_var[0]);
-            printf("env_var[1] is: %s\n", env_var[1]);
-            if (env_var[1] != NULL)
-                printf("env_var[2] is: %s\n", env_var[2]);
-            set = is_var_set(sh->env_header, env_var[0]);
-            printf("set is: %d\n", set);
-            mini_export_execve_edition(sh, set, arg);
-            if (set != -1) //existing env_var
-            {
-                if (env_var[1] != NULL) //true if assigned var
-                    env_var_update(env_var, sh->env_header);
-            }
-            else
-                add_env_var(env_var, sh->env_header);
-            free_matrix(env_var);
-        }
+            simple_export(env_var, set, arg, sh);
     }
     return 0;
 }

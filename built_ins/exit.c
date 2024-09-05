@@ -12,7 +12,21 @@
 
 #include "../minishell.h"
 
-//TENGO QUE CREAR FUNCIÓN FREE global
+/*
+**  free_parsing_list -> frees t_parsed_data
+**  free_env_list -> frees t_env data
+*/
+void exit_free(t_sh_data **sh)
+{
+    free_parsing_list(sh);
+    free_env_list((*sh)->env_header);
+    free_matrix((*sh)->env);
+    free((*sh)->prev_line);
+    free((*sh)->new_line);
+    free((*sh)->last_exit_status);
+    free((*sh));
+}
+
 int mini_exit(t_parsed_data *header, t_sh_data *sh)
 {
     int i;
@@ -47,22 +61,26 @@ int mini_exit(t_parsed_data *header, t_sh_data *sh)
             if (header->cmd[1][0] == '-')
             {
                 res = 256 - (ft_atoi(header->cmd[1]) % 256);
+                exit_free(&sh);
                 exit(res);
                 //return (256 - (ft_atoi(header->cmd[1]) % 256));
             }
             res = ft_atoi(header->cmd[1]) % 256;
+            exit_free(&sh);
             exit(res);
             //return (ft_atoi(header->cmd[1]) % 256);
         }
         else
         {
-            printf("bash: exit: %s: numeric argument required\n", header->cmd[i]);
+            printf("bash: exit: %s: numeric argument required\n", header->cmd[1]);
+            exit_free(&sh);
             exit(2);
             //return 2;
         }
     }
     //exit has no args
     printf("exit\n");
+    exit_free(&sh);
     exit (0);
     //return (0);
 

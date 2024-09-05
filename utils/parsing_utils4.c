@@ -18,9 +18,9 @@
 **  Moves the cursor back two spaces and clears 
 **  the line from the cursor position to the end.
 */
-int	intermediate_heredoc(t_list *hdoc, char *line)
+int	intermediate_heredoc(t_list **hdoc, char *line)
 {
-	while (hdoc->next != NULL)
+	while ((*hdoc)->next != NULL)
 	{
 		while (1)
 		{
@@ -32,8 +32,8 @@ int	intermediate_heredoc(t_list *hdoc, char *line)
 				write(1, "\n", 1);
 				break ;
 			}
-			if (ft_strncmp(line, hdoc->content, ft_strlen(hdoc->content))
-				== 0 && line[ft_strlen(hdoc->content)] == '\n')
+			if (ft_strncmp(line, (*hdoc)->content, ft_strlen((*hdoc)->content))
+				== 0 && line[ft_strlen((*hdoc)->content)] == '\n')
 			{
 				free(line);
 				break ;
@@ -42,7 +42,7 @@ int	intermediate_heredoc(t_list *hdoc, char *line)
 		}
 		if (signal_received == 1)
 			return (-2);
-		hdoc = hdoc->next;
+		(*hdoc) = (*hdoc)->next;
 	}
 	return (0);
 }
@@ -118,7 +118,7 @@ int	heredoc_to_infile(t_list *hdoc)
 	heredoc_signals();
 	if (access("karaket.txt", F_OK) == 0)
 		unlink("karaket.txt");
-	if (intermediate_heredoc(hdoc, line) == -2)
+	if (intermediate_heredoc(&hdoc, line) == -2)
 		return (-2);
 	new_fd = open("karaket.txt", O_RDWR | O_CREAT | O_APPEND, 0666);
 	if (new_fd == -1)

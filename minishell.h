@@ -116,6 +116,7 @@ int ignore_history(char *line);
 int append_line(t_sh_data *sh, char *line);
 int save_to_history(t_sh_data *sh, char *line, int e_pipe);
 int get_input(t_sh_data *sh, char *line, int e_pipe);
+void status130_131(t_sh_data *sh);
 void shell_loop(t_sh_data **sh, int checker, int e_pipe);
 
 //built_ins/env.c
@@ -126,6 +127,7 @@ int mini_export (t_parsed_data *header, t_sh_data *sh);
 void no_arg_export(t_env *env);
 void    env_var_update(char **env_var, t_env *env);
 void    add_env_var(char **env_var, t_env *env);
+void simple_export(char **env_var, int set, char *arg, t_sh_data *sh);
 
 //built_ins/export_utils.c
 int    is_var_set(t_env *env, char *cmd);
@@ -151,20 +153,25 @@ t_env *free_node_unset(t_env *node);
 int mini_echo(t_parsed_data *header);
 
 //built_ins/cd.c
-char * custom_getenv(t_env *head, const char *name);
-int is_directory(char *fname);
-void cd_create_update(char *env_name, char *env_value, t_sh_data *sh, int flag);
-int update_env_directories (t_sh_data *sh, char *old_dir);
 int chdir_home(t_sh_data *sh, char *old_dir);
 int chdir_oldpwd(t_sh_data *sh, char *old_dir);
 int chdir_basecase(t_parsed_data *header, t_sh_data *sh, char *old_dir);
 int do_cd(t_parsed_data *header, t_sh_data *sh, char *pwd);
 int mini_cd(t_parsed_data *header, t_sh_data *sh);
 
+//built_ins/cd_utils.c
+int is_directory(char *fname);
+void cd_create(char **env_var, t_sh_data *sh, int set, char *execve_var);
+void cd_update(char **env_var, t_sh_data *sh, int set, char *execve_var);
+void cd_create_update(char *env_name, char *env_value, t_sh_data *sh, int flag);
+int update_env_directories (t_sh_data *sh, char *old_dir);
+
+
 //built_ins/pwd.c
 int	mini_pwd(void);
 
 //built_ins/exit.c
+void exit_free(t_sh_data **sh);
 int mini_exit(t_parsed_data *header, t_sh_data *sh);
 
 //signals/signals.c
@@ -204,6 +211,7 @@ int env_quotes(char c, int *single_q, int *double_q, int *j);
 char *find_env_pair(t_env *head, char *var_name);
 size_t	env_count_char(const char *s, char c);
 char **env_split(const char *s, char c);
+char * custom_getenv(t_env *head, const char *name);
 
 //utils/input_utils.c
 int	bad_initial_char(char *line, t_sh_data **sh);
@@ -248,7 +256,7 @@ int fill_path(t_sh_data *sh, t_parsed_data *node);
 int parse_cmd_and_path(t_sh_data *sh, t_parsed_data *node, char **segment, char **cpy_segment);
 
 //utils/parsing_utils4.c
-int intermediate_heredoc(t_list *hdoc, char *line);
+int	intermediate_heredoc(t_list **hdoc, char *line);
 int final_hdoc(t_list *hdoc, char *line, int new_fd);
 int prepare_karaket(int new_fd);
 int heredoc_to_infile(t_list *hdoc);

@@ -48,6 +48,7 @@ char **dup_sh_env(char **env, int set)
         new_env[i] = ft_strdup(env[i]);
         i++;
     }
+    free_matrix(env);
     return new_env;
 }
 
@@ -64,7 +65,7 @@ void mini_export_execve_edition(t_sh_data *sh, int set, char *cmd)
     char **new_env;
     char *var_value;
 
-    new_env = dup_sh_env(sh->env, set);
+    new_env = dup_sh_env(sh->env, set); //need to free new_env
     if (new_env == NULL)
         printf("mini_export_execve_edition(): malloc failure\n"); //needs to exit
     if (set != -1) //existing env_var
