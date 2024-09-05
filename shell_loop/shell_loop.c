@@ -82,7 +82,9 @@ int get_input(t_sh_data *sh, char *line, int e_pipe)
     if (line == NULL)
     {
         printf("exit\n");
-        pre_parse_cleanup(&sh, NULL, NULL);
+        //pre_parse_cleanup(&sh, NULL, NULL);
+        exit_free(&sh);
+        exit(1);
     }
     if (e_pipe == 1 && signal_received == 3)
     {
