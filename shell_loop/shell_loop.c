@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 15:50:59 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/09/06 15:26:43 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/06 15:52:43 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,6 @@ void	shell_loop(t_sh_data **sh, int checker, int e_pipe)
 			continue ;
 		}
 		(*sh)->parsed_header = parsing(*sh, NULL, 0);
-		printf("node->path is: %s\n", (*sh)->parsed_header->path);
 		if ((*sh)->parsed_header == NULL)
 			continue ;
 		piping(*sh);

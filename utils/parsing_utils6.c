@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/06 13:04:40 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/09/06 15:33:29 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/06 15:52:24 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,7 @@ char	*path_is_exec(t_parsed_data *node, char **env_value, char *end)
 
 	if (is_absolute_path(node) == 1 || ft_strlen(node->cmd[0]) == 0)
 		return (NULL);
-	printf("not absolute\n");
 	end = ft_strjoin("/", node->cmd[0]);
-	printf("end is: %s\n", end);
 	if (end == NULL)
 		return ((char *) -1);
 	while (*env_value != NULL)
@@ -124,7 +122,6 @@ int	fill_path(t_sh_data *sh, t_parsed_data *node)
 	if (env_path == NULL)
 		return (0);
 	path = path_is_exec(node, env_path, NULL);
-	printf("node->path is: %s\n", path);
 	free_matrix(env_path);
 	if (node->path != NULL)
 		return (1);
