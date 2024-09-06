@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 20:09:45 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/09/05 17:50:21 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/06 13:32:00 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ void	parsed_node_init(t_parsed_data *node)
 void	parse_line(t_sh_data **sh, t_parsed_data **header, char **split_space,
 		char **pipe_segments)
 {
-	t_parsed_data	*node;
+	t_parsed_data		*node;
 	t_result			res;
 
 	node = (t_parsed_data *)malloc(sizeof(t_parsed_data));

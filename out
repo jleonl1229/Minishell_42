@@ -1,19 +1,2 @@
-built_ins
-errors_frees
-execution
-Makefile
-minishell
-minishell.c
-minishell.h
-minishell_libft
-minishell.o
-out
-parsing
-readline.supp
-shell_init
-shell_loop
-signals
-test
-tesy
-utils
-yes sir
+hello
+hello

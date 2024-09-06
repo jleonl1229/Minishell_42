@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 18:21:40 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/09/04 18:31:06 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/06 13:27:57 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,18 +99,18 @@ int	valid_not_implemented(char *line)
 {
 	const char	*patterns[] = {"<<<", "|>|", "||", ">|", NULL};
 	int			i;
-	char		*found;
+	char		*f;
 	char		next_char;
 
 	i = 0;
 	while (patterns[i] != NULL)
 	{
-		found = ft_strnstr(line, patterns[i], strlen(line));
-		if (found != NULL)
+		f = ft_strnstr(line, patterns[i], strlen(line));
+		if (f != NULL)
 		{
-			if (found > line && (*(--found) == '|' || *found == '<' || *found == '>'))
+			if (f > line && (*(--f) == '|' || *f == '<' || *f == '>'))
 				return (0);
-			next_char = *(found + ft_strlen(patterns[i]) + 1);
+			next_char = *(f + ft_strlen(patterns[i]) + 1);
 			if (next_char != '\0' && next_char != '|' && next_char != '<'
 				&& next_char != '>')
 			{

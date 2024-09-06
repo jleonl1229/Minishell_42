@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 17:47:23 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/09/05 18:20:41 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/06 15:16:02 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,6 +198,7 @@ int				mini_pwd(void);
 
 //built_ins/exit.c
 void			exit_free(t_sh_data **sh);
+void			numeric_exit(t_parsed_data *header, t_sh_data *sh, int i);
 int				mini_exit(t_parsed_data *header, t_sh_data *sh);
 
 //signals/signals.c
@@ -265,28 +266,17 @@ size_t			count_char(const char *s, char c);
 char			**ft_split_quotes(const char *s, char c);
 
 //utils/parsing_utils2.c
-int				is_special_char(char c);
+int				schar(char c);
 int				new_line_length(char *line, int len,
 					int in_dquote, int in_squote);
-void			fill_new_line(char **new_line, char *line,
+void			fill_new_line(char **new_line, char *l,
 					int in_squote, int in_dquote);
 void			add_space(t_sh_data *sh);
+void			parse_add_node(t_parsed_data **head, t_parsed_data *new_node);
 
 //utils/parsing_utils3.c
-void			parse_add_node(t_parsed_data **head, t_parsed_data *new_node);
-char			**alloc_cpy_segment(char **segment);
-int				mod_cpy_segment(char **cpy_segment, int i,
-					t_parsed_data *parsed_data, char **segment);
-int				redir_fd(t_parsed_data *parsed_data,
-					int *redir, char *file, char *redir_type);
-int				handle_redir(char *redir, char *file,
-					t_parsed_data *parsed_data);
-t_result		parse_redir(t_parsed_data *parsed_data,
-					char **split_space, int i, int sentinel);
-t_result		cmd_arr(char **cpy_segment, int i, int count);
-int				fill_cmd_and_args(int i, t_parsed_data *node,
+int				fill_cmd_args(int i, t_parsed_data *node,
 					char **cmd);
-int				is_absolute_path(t_parsed_data *node);
 char			*path_is_exec(t_parsed_data *node, char **env_value, char *end);
 char			**extract_path(t_sh_data *sh);
 int				fill_path(t_sh_data *sh, t_parsed_data *node);
@@ -298,3 +288,18 @@ int				intermediate_heredoc(t_list **hdoc, char *line);
 int				final_hdoc(t_list *hdoc, char *line, int new_fd);
 int				prepare_karaket(int new_fd);
 int				heredoc_to_infile(t_list *hdoc);
+
+//utils/parsing_utils5.c
+char			**alloc_cpy_segment(char **segment);
+int				mod_cpy_segment(char **cpy_segment, int i,
+					t_parsed_data *parsed_data, char **segment);
+int				redir_fd(t_parsed_data *parsed_data,
+					int *redir, char *file, char *redir_type);
+int				handle_redir(char *redir, char *file,
+					t_parsed_data *p_data);
+t_result		parse_redir(t_parsed_data *p_data,
+					char **split_space, int i, int sentinel);
+
+//utils/parsing_utils6.c
+t_result		cmd_arr(char **cpy_segment, int i, int count);
+int				is_absolute_path(t_parsed_data *node);

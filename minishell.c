@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 17:45:40 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/09/04 17:55:57 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/06 13:30:45 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int	env_checker(char **envp, t_sh_data **sh)
 	if (envp == NULL || *envp == NULL)
 	{
 		printf("No ENV found, don't delete ENVs!");
-		return 1;
+		return (1);
 	}
 	while (*envp != NULL)
 	{
@@ -34,11 +34,8 @@ int	env_checker(char **envp, t_sh_data **sh)
 		envp++;
 	}
 	if (path_found == 0)
-	{
-		//printf("bash: %s: No such file or directory\n", (*sh)->prev_line);
-		return 2;
-	}
-	return 0;
+		return (2);
+	return (0);
 }
 
 // exits program if argc is not 1

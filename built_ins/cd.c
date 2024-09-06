@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 17:36:46 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/09/05 17:42:44 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/06 12:19:54 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,5 +146,5 @@ int	mini_cd(t_parsed_data *header, t_sh_data *sh)
 		return (1);
 	if (is_simple_cmd(sh) == 1)
 		return (do_cd(header, sh, pwd));
-	return (1);
+	return (0);
 }

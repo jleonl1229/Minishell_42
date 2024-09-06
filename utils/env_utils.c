@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 17:56:20 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/09/04 18:08:25 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/06 13:26:31 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ char	*find_env_pair(t_env *head, char *var_name)
 		if (ft_strncmp(current->env_name, var_name, ft_strlen(var_name)) == 0
 			&& ft_strlen(current->env_name) == ft_strlen(var_name))
 		{
-			//free(var_name);
 			if (current->env_value != NULL)
 				return (ft_strdup(current->env_value));
 			else

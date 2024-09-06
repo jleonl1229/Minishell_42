@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 15:56:34 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/09/05 16:28:54 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/06 13:34:16 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,9 +150,4 @@ void	piping(t_sh_data *sh)
 	}
 	dup2(original_stdin, STDIN_FILENO);
 	close(original_stdin);
-    /*for (int fd = 0; fd <100; fd++) {
-    if (fcntl(fd, F_GETFD) != -1) {
-   	printf("File descriptor %d is open\n", fd);
-    }
-    }*/
 }

@@ -6,7 +6,7 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 19:53:18 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/09/04 20:08:51 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/06 14:20:11 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,10 +89,7 @@ char	**get_var_content(char *input, int start, t_sh_data *sh)
 		return (NULL);
 	result[0] = ft_strdup(var_name);
 	if (result[0] == NULL)
-	{
-		free(var_name);
-		return (free_matrix(result));
-	}
+		return (free(var_name), free_matrix(result));
 	if (ft_strncmp(var_name, "?", ft_strlen(var_name)) == 0
 		&& ft_strlen(var_name) == ft_strlen("?"))
 		var_content = ft_strdup(sh->last_exit_status);

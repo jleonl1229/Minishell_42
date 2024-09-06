@@ -6,13 +6,13 @@
 /*   By: mzuloaga <mzuloaga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 19:06:30 by mzuloaga          #+#    #+#             */
-/*   Updated: 2024/09/04 19:19:17 by mzuloaga         ###   ########.fr       */
+/*   Updated: 2024/09/06 15:15:47 by mzuloaga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int	is_special_char(char c)
+int	schar(char c)
 {
 	return (c == '|' || c == '<' || c == '>');
 }
@@ -35,13 +35,13 @@ int	new_line_length(char *line, int len, int in_dquote, int in_squote)
 			in_squote = !in_squote;
 		else if (line[i] == '\"' && !in_squote)
 			in_dquote = !in_dquote;
-		if (!in_squote && !in_dquote && is_special_char(line[i]))
+		if (!in_squote && !in_dquote && schar(line[i]))
 		{
-			if (i > 0 && line[i - 1] != ' ' && !is_special_char(line[i -1]))
+			if (i > 0 && line[i - 1] != ' ' && !schar(line[i -1]))
 				new_len++;
 			new_len++;
 			if (i < len - 1 && line[i + 1] != ' '
-				&& !is_special_char(line[i + 1]))
+				&& !schar(line[i + 1]))
 				new_len++;
 		}
 		else
@@ -51,36 +51,29 @@ int	new_line_length(char *line, int len, int in_dquote, int in_squote)
 	return (new_len);
 }
 
-/*
-**	copies the old string into a new string taking into
-**	consideration the spaces around special chars
-*/
-void	fill_new_line(char **new_line, char *line, int in_squote, int in_dquote)
+void	fill_new_line(char **new_line, char *l, int in_squote, int in_dquote)
 {
-	int	i;
-	int	j;
-	int	len;
+	size_t	i;
+	int		j;
 
 	i = 0;
 	j = 0;
-	len = ft_strlen(line);
-	while (i < len)
+	while (i < ft_strlen(l))
 	{
-		if (line[i] == '\'' && !in_dquote)
+		if (l[i] == '\'' && !in_dquote)
 			in_squote = !in_squote;
-		else if (line[i] == '\"' && !in_squote)
+		else if (l[i] == '\"' && !in_squote)
 			in_dquote = !in_dquote;
-		if (!in_squote && !in_dquote && is_special_char(line[i]))
+		if (!in_squote && !in_dquote && schar(l[i]))
 		{
-			if (i > 0 && line[i - 1] != ' ' && !is_special_char(line[i -1]))
+			if (i > 0 && l[i - 1] != ' ' && !schar(l[i -1]))
 				(*new_line)[j++] = ' ';
-			(*new_line)[j++] = line[i];
-			if (i < len - 1 && line[i + 1] != ' '
-				&& !is_special_char(line[i +1]))
+			(*new_line)[j++] = l[i];
+			if (i < ft_strlen(l) - 1 && l[i + 1] != ' ' && !schar(l[i +1]))
 				(*new_line)[j++] = ' ';
 		}
 		else
-			(*new_line)[j++] = line[i];
+			(*new_line)[j++] = l[i];
 		i++;
 	}
 	(*new_line)[j] = '\0';
@@ -111,4 +104,21 @@ void	add_space(t_sh_data *sh)
 		pre_parse_cleanup (&sh, 0, 0);
 	}
 	free(new_line);
+}
+
+// adds node to the bottom of the linked list
+void	parse_add_node(t_parsed_data **head, t_parsed_data *new_node)
+{
+	t_parsed_data	*current;
+
+	if (*head == NULL)
+		*head = new_node;
+	else
+	{
+		current = *head;
+		while (current->next != NULL)
+			current = current->next;
+		current->next = new_node;
+	}
+	new_node->next = NULL;
 }
