@@ -16,7 +16,7 @@
 **  gets the PATH env_var from the env_vars linked list
 **  and splits it into a char **
 */
-char	**extract_path(t_sh_data *sh)
+/*char	**extract_path(t_sh_data *sh)
 {
 	t_env	*current;
 	char	*to_split;
@@ -37,14 +37,14 @@ char	**extract_path(t_sh_data *sh)
 	if (path == NULL)
 		free_matrix(sh->parsed_header->cmd);
 	return (path);
-}
+}*/
 
 /*
 **  fills the path to executable data of the t_parsed_node.
 **  if the cmd is a builtin cmd it fills the path with the builtin name
 **  returns 1 if no error, 0 if malloc failure
 */
-int fill_path(t_sh_data *sh, t_parsed_data *node)
+/*int fill_path(t_sh_data *sh, t_parsed_data *node)
 {
     char **env_path;
     char *path;
@@ -68,7 +68,7 @@ int fill_path(t_sh_data *sh, t_parsed_data *node)
     }
     node->path = path;
     return 1;
-}
+}*/
 
  /*
  **  params:
@@ -80,7 +80,7 @@ int fill_path(t_sh_data *sh, t_parsed_data *node)
  ** cmd.error_code 1 --> count 0, meaning there's no command to parse
  ** cmd.error_code 2 --> malloc failure
  */
- int	parse_cmd_and_path(t_sh_data *sh, t_parsed_data *node,
+ /*int	parse_cmd_and_path(t_sh_data *sh, t_parsed_data *node,
  	char **segment, char **cpy_segment)
  {
     int i;
@@ -108,4 +108,4 @@ int fill_path(t_sh_data *sh, t_parsed_data *node)
     }
 	free_matrix(cmd.str_arr);
     return 1;
- }
+ }*/

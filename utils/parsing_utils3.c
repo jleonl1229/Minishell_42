@@ -360,6 +360,8 @@ int fill_path(t_sh_data *sh, t_parsed_data *node)
         node->path = ft_strdup(node->cmd[0]); //unprotected
         return 1;
     }
+    if (env_checker(sh->env, &sh) == 2)
+        return 3;
     env_path = extract_path(sh);
     if (env_path == NULL)
         return 0;

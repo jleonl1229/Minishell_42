@@ -215,7 +215,7 @@ int				three_valid(char *line);
 int				input_validation(char *line, t_sh_data **sh);
 
 //minishell.c
-void			env_checker(char **envp, t_sh_data **sh);
+int				env_checker(char **envp, t_sh_data **sh);
 void			argc_checker(int argc, t_sh_data **sh);
 
 //errors_frees/frees.c

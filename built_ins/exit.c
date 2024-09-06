@@ -18,6 +18,7 @@
 */
 void	exit_free(t_sh_data **sh)
 {
+    
 	free_parsing_list(sh);
 	free_env_list((*sh)->env_header);
 	free_matrix((*sh)->env);

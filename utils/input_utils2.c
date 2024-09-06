@@ -108,7 +108,7 @@ int	valid_not_implemented(char *line)
 		found = ft_strnstr(line, patterns[i], strlen(line));
 		if (found != NULL)
 		{
-			if (*(--found) == '|' || *found == '<' || *found == '>')
+			if (found > line && (*(--found) == '|' || *found == '<' || *found == '>'))
 				return (0);
 			next_char = *(found + ft_strlen(patterns[i]) + 1);
 			if (next_char != '\0' && next_char != '|' && next_char != '<'

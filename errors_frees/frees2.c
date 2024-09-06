@@ -29,6 +29,7 @@ void	frees_before_next_ite(char *line, t_sh_data **sh)
 	free((*sh)->new_line);
 	(*sh)->new_line = NULL;
 	free_parsing_list(sh);
+	(*sh)->parsed_header = NULL;
 }
 
 void	free_hdoc_sigint(t_parsed_data *node, t_sh_data *sh,
